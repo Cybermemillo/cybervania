@@ -1,361 +1,201 @@
+/**
+ * Clase para el jugador del juego
+ */
 export class Player {
     constructor(data = {}) {
         // Datos básicos
         this.name = data.name || 'Hacker';
+        this.gender = data.gender || 'male';
         this.specialization = data.specialization || 'neutral';
-        
-        // Atributos principales
-        this.health = data.health || 70;
-        this.maxHealth = data.maxHealth || 70;
-        this.defense = data.defense || 0;
-        this.actionPoints = data.actionPoints || 3;
-        this.maxActionPoints = data.maxActionPoints || 3;
-        
-        // Recursos
-        this.credits = data.credits || 100;
-        
-        // Habilidades
-        this.offensiveSkill = data.offensiveSkill || 1;
-        this.defensiveSkill = data.defensiveSkill || 1;
-        
-        // Inventario
-        this.artifacts = data.artifacts || [];
-        this.potions = data.potions || [];
-        
-        // Estados de combate
-        this.status = {
-            vulnerable: 0,
-            weak: 0,
-            poisoned: 0,
-            burning: 0,
-            strength: 0,
-            dexterity: 0
-        };
+        this.backstory = data.backstory || '';
         
         // Estadísticas
-        this.stats = {
-            enemiesDefeated: 0,
-            damageDealt: 0,
-            damageReceived: 0,
-            cardsPlayed: 0,
-            creditsCollected: 0,
-            elitesKilled: 0,
-            bossesKilled: 0,
-            turnsPlayed: 0,
-            maxCombo: 0,
-            losses: 0,
-            floors: 1
-        };
+        this.level = data.level || 1;
+        this.experience = data.experience || 0;
+        this.health = data.health || 100;
+        this.maxHealth = data.maxHealth || 100;
+        this.energy = data.energy || 100;
+        this.maxEnergy = data.maxEnergy || 100;
         
-        // Aplicar bonificaciones según especialización
-        this.applySpecializationBonuses();
+        // Recursos
+        this.credits = data.credits || 500;
+        this.inventory = data.inventory || [];
+        
+        // Metadatos
+        this.slot = data.slot || -1;
+        this.lastSaved = data.lastSaved || new Date().toISOString();
+        this.playTime = data.playTime || 0;
+        
+        // Ajustar estadísticas según especialización
+        this.applySpecializationBonus();
     }
     
-    applySpecializationBonuses() {
-        switch (this.specialization) {
-            case 'red': // Ataque
-                this.offensiveSkill += 1;
+    applySpecializationBonus() {
+        switch(this.specialization) {
+            case 'red':
+                // Bonus ofensivo (daño +25%, salud -5%, defensa -10%)
+                this.attackBonus = 0.25;
+                this.maxHealth = Math.round(this.maxHealth * 0.95);
+                this.health = this.maxHealth;
+                this.defenseBonus = -0.1;
+                this.actionPoints = 3;
                 break;
                 
-            case 'blue': // Defensa
-                this.defensiveSkill += 1;
-                this.maxHealth += 5;
-                this.health += 5;
+            case 'blue':
+                // Bonus defensivo (salud +15%, defensa +20%, ataque -5%)
+                this.maxHealth = Math.round(this.maxHealth * 1.15);
+                this.health = this.maxHealth;
+                this.defenseBonus = 0.2;
+                this.attackBonus = -0.05;
+                this.actionPoints = 3;
                 break;
                 
-            case 'purple': // Equilibrado
-                this.maxActionPoints += 1;
-                this.actionPoints += 1;
+            case 'purple':
+                // Equilibrado con acción extra (todo +5%)
+                this.maxHealth = Math.round(this.maxHealth * 1.05);
+                this.health = this.maxHealth;
+                this.defenseBonus = 0.05;
+                this.attackBonus = 0.05;
+                this.actionPoints = 4;
                 break;
+                
+            default:
+                // Sin bonificaciones
+                this.attackBonus = 0;
+                this.defenseBonus = 0;
+                this.actionPoints = 3;
         }
     }
     
-    takeDamage(amount) {
-        // Aplicar vulnerabilidad si corresponde
-        if (this.status.vulnerable > 0) {
-            amount = Math.floor(amount * 1.5);
-        }
+    /**
+     * Guarda el estado del jugador en un slot
+     */
+    save(slotIndex) {
+        this.slot = slotIndex;
+        this.lastSaved = new Date().toISOString();
         
-        // Reducir daño por defensa
-        let actualDamage = amount;
-        if (this.defense > 0) {
-            if (amount <= this.defense) {
-                this.defense -= amount;
-                actualDamage = 0;
-            } else {
-                actualDamage = amount - this.defense;
-                this.defense = 0;
-            }
-        }
+        // Guardar en localStorage
+        const saveData = this.serialize();
+        localStorage.setItem(`cybervania_save_${slotIndex}`, JSON.stringify(saveData));
         
-        // Aplicar daño y registrar estadísticas
-        this.health = Math.max(0, this.health - actualDamage);
-        this.stats.damageReceived += actualDamage;
-        
-        return {
-            damageTaken: actualDamage,
-            remainingDefense: this.defense,
-            remainingHealth: this.health
+        // Actualizar información de slots
+        const slots = Player.getSaveSlotInfo();
+        slots[slotIndex] = {
+            isEmpty: false,
+            playerName: this.name,
+            level: this.level,
+            specialization: this.specialization,
+            gender: this.gender,
+            timestamp: new Date().getTime()
         };
-    }
-    
-    heal(amount) {
-        // No permitir curar más allá de la salud máxima
-        const actualHeal = Math.min(amount, this.maxHealth - this.health);
-        this.health += actualHeal;
         
-        return actualHeal;
-    }
-    
-    gainDefense(amount) {
-        // Aplicar bonificaciones de destreza
-        if (this.status.dexterity > 0) {
-            amount += this.status.dexterity;
-        }
+        localStorage.setItem('cybervania_save_slots', JSON.stringify(slots));
         
-        // Aplicar efectos de artefactos
-        amount = this.applyArtifactEffects('defense_gain', amount);
-        
-        this.defense += amount;
-        return amount;
-    }
-    
-    spendActionPoints(amount) {
-        // No permitir gastar más de los puntos disponibles
-        if (amount > this.actionPoints) {
-            return false;
-        }
-        
-        this.actionPoints -= amount;
         return true;
     }
     
-    gainActionPoints(amount) {
-        this.actionPoints = Math.min(this.maxActionPoints, this.actionPoints + amount);
-        return this.actionPoints;
-    }
-    
-    resetActionPoints() {
-        this.actionPoints = this.maxActionPoints;
-        return this.actionPoints;
-    }
-    
-    addArtifact(artifact) {
-        // Aplicar efectos inmediatos si los hay
-        if (artifact.immediateEffect) {
-            this.applyArtifactImmediateEffect(artifact);
-        }
-        
-        // Añadir al inventario
-        this.artifacts.push(artifact);
-    }
-    
-    hasArtifact(artifactId) {
-        return this.artifacts.some(artifact => artifact.id === artifactId);
-    }
-    
-    removeArtifact(artifactId) {
-        const index = this.artifacts.findIndex(a => a.id === artifactId);
-        if (index !== -1) {
-            const artifact = this.artifacts[index];
-            this.artifacts.splice(index, 1);
-            return artifact;
-        }
-        return null;
-    }
-    
-    applyArtifactImmediateEffect(artifact) {
-        switch (artifact.id) {
-            case 'usb_booster':
-                this.maxActionPoints += 1;
-                this.actionPoints += 1;
-                break;
-                
-            case 'medical_kit':
-                this.heal(Math.floor(this.maxHealth * 0.3));
-                break;
-                
-            case 'skill_chip':
-                this.offensiveSkill += 1;
-                this.defensiveSkill += 1;
-                break;
-                
-            case 'upgrade_module':
-                this.maxHealth += 10;
-                this.health += 10;
-                break;
-        }
-    }
-    
-    applyArtifactEffects(triggerType, value) {
-        let modifiedValue = value;
-        
-        for (const artifact of this.artifacts) {
-            switch (triggerType) {
-                case 'defense_gain':
-                    if (artifact.id === 'encryption_key') {
-                        modifiedValue += artifact.value;
-                    }
-                    break;
-                    
-                case 'damage_dealt':
-                    if (artifact.id === 'rootkit_module' && this.isFirstCardOfCombat) {
-                        modifiedValue += artifact.value;
-                        this.isFirstCardOfCombat = false;
-                    }
-                    break;
-                    
-                // Más casos para otros tipos de efectos
-                
-                case 'turn_start':
-                    if (artifact.id === 'vpn_shield') {
-                        this.gainDefense(artifact.value);
-                    }
-                    break;
-            }
-        }
-        
-        return modifiedValue;
-    }
-    
-    processStatusEffects() {
-        // Procesar efectos de estado al inicio del turno
-        let damageFromStatus = 0;
-        
-        // Veneno
-        if (this.status.poisoned > 0) {
-            const poisonDamage = Math.ceil(this.status.poisoned / 2);
-            this.health -= poisonDamage;
-            damageFromStatus += poisonDamage;
-            this.status.poisoned--;
-        }
-        
-        // Quemadura
-        if (this.status.burning > 0) {
-            const burnDamage = 3;
-            this.health -= burnDamage;
-            damageFromStatus += burnDamage;
-            this.status.burning--;
-        }
-        
-        // Disminuir duración de otros estados
-        for (const status in this.status) {
-            if (status !== 'poisoned' && status !== 'burning' && 
-                status !== 'strength' && status !== 'dexterity') {
-                if (this.status[status] > 0) {
-                    this.status[status]--;
-                }
-            }
-        }
-        
-        return damageFromStatus;
-    }
-    
-    startCombat() {
-        // Reiniciar estados al inicio del combate
-        this.defense = 0;
-        this.actionPoints = this.maxActionPoints;
-        this.isFirstCardOfCombat = true;
-        
-        // Reiniciar estados temporales
-        this.status = {
-            vulnerable: 0,
-            weak: 0,
-            poisoned: 0,
-            burning: 0,
-            strength: 0,
-            dexterity: 0
-        };
-        
-        // Aplicar efectos de artefactos al inicio del combate
-        for (const artifact of this.artifacts) {
-            if (artifact.effect === 'start_vulnerable' && artifact.id === 'rootkit_module') {
-                // Este se maneja desde el lado de la escena de combate
-            }
-        }
-    }
-    
-    endCombat() {
-        // Limpiar estados al final del combate
-        this.defense = 0;
-        this.status = {
-            vulnerable: 0,
-            weak: 0,
-            poisoned: 0,
-            burning: 0,
-            strength: 0,
-            dexterity: 0
-        };
-    }
-    
-    hasSpecialRestOption() {
-        // Verificar si tiene artefactos que otorguen opciones especiales de descanso
-        return this.artifacts.some(artifact => artifact.id === 'neural_implant');
-    }
-    
-    getSpecialRestOption() {
-        // Devolver opción especial de descanso según artefactos
-        if (this.hasArtifact('neural_implant')) {
-            return {
-                id: 'neural_upgrade',
-                name: 'Mejora Neural',
-                description: 'Duplica una carta de tu mazo.',
-                effect: 'duplicate_card'
-            };
-        }
-        
-        return null;
-    }
-    
-    levelUp() {
-        // Aumentar atributos al subir nivel
-        this.maxHealth += 5;
-        this.health += 5;
-        
-        // Aumentar habilidades según especialización
-        if (this.specialization === 'red') {
-            this.offensiveSkill += 1;
-        } else if (this.specialization === 'blue') {
-            this.defensiveSkill += 1;
-        } else {
-            // Para purple o cualquier otra
-            if (Math.random() < 0.5) {
-                this.offensiveSkill += 1;
-            } else {
-                this.defensiveSkill += 1;
-            }
-        }
-        
-        this.stats.floors++;
-        
-        return {
-            newMaxHealth: this.maxHealth,
-            offensiveSkill: this.offensiveSkill,
-            defensiveSkill: this.defensiveSkill
-        };
-    }
-    
+    /**
+     * Serializa el objeto para guardado
+     */
     serialize() {
-        // Convertir a formato para guardado
         return {
             name: this.name,
+            gender: this.gender,
             specialization: this.specialization,
+            backstory: this.backstory,
+            level: this.level,
+            experience: this.experience,
             health: this.health,
             maxHealth: this.maxHealth,
-            defense: this.defense,
-            actionPoints: this.actionPoints,
-            maxActionPoints: this.maxActionPoints,
+            energy: this.energy,
+            maxEnergy: this.maxEnergy,
             credits: this.credits,
-            offensiveSkill: this.offensiveSkill,
-            defensiveSkill: this.defensiveSkill,
-            artifacts: this.artifacts,
-            potions: this.potions,
-            stats: this.stats
+            inventory: this.inventory,
+            slot: this.slot,
+            lastSaved: this.lastSaved,
+            playTime: this.playTime
         };
     }
     
-    static deserialize(data) {
-        // Crear jugador desde datos guardados
-        return new Player(data);
+    /**
+     * Inicia una nueva partida
+     */
+    static startNewGame(name, specialization, gender, backstory = '') {
+        return new Player({
+            name,
+            specialization,
+            gender,
+            backstory,
+            slot: -1 // Aún no guardada
+        });
+    }
+    
+    /**
+     * Carga una partida desde un slot
+     */
+    static loadGame(slotIndex) {
+        try {
+            const saveData = localStorage.getItem(`cybervania_save_${slotIndex}`);
+            if (!saveData) return null;
+            
+            return new Player(JSON.parse(saveData));
+        } catch (e) {
+            console.error('Error cargando partida:', e);
+            return null;
+        }
+    }
+    
+    /**
+     * Obtiene información de los slots de guardado
+     */
+    static getSaveSlotInfo() {
+        let slots;
+        try {
+            const slotsData = localStorage.getItem('cybervania_save_slots');
+            slots = slotsData ? JSON.parse(slotsData) : [];
+        } catch (e) {
+            slots = [];
+        }
+        
+        // Asegurar que tenemos 3 slots
+        while (slots.length < 3) {
+            slots.push({ isEmpty: true });
+        }
+        
+        return slots;
+    }
+    
+    /**
+     * Obtiene el tema del menú principal (personalizado en futuras versiones)
+     */
+    static getMainMenuTheme() {
+        return {
+            title: "CYBERVANIA",
+            subtitle: "Donde la oscuridad se encuentra con el código",
+            uiElements: {
+                menuFrameColor: "rgba(50, 10, 40, 0.9)",
+                textGlowColor: "rgba(220, 20, 120, 0.6)",
+                mistOpacity: "0.4",
+                backgroundBlur: "5px",
+                font: "'NeoGothic', 'Cinzel', serif",
+                cursor: "default"
+            },
+            menuItems: [
+                { id: "new-game", text: "Nueva Partida", icon: "glyph-plus" },
+                { id: "load-game", text: "Cargar Partida", icon: "glyph-load" },
+                { id: "options", text: "Opciones", icon: "glyph-gear" },
+                { id: "exit", text: "Salir", icon: "glyph-power" }
+            ],
+            audio: {
+                backgroundTrack: "menu_theme.mp3",
+                hoverSound: "menu_hover.mp3",
+                selectSound: "menu_select.mp3",
+                backSound: "menu_back.mp3"
+            },
+            animations: {
+                menuEntrance: "fade-from-mist",
+                transitionEffect: "digital-dissolve"
+            }
+        };
     }
 }

@@ -1,0 +1,26 @@
+{
+    "sourceFile": "css/menu.css",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1741025796992,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1741025959979,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -401,4 +401,6 @@\n     padding: 15px;\r\n     cursor: pointer;\r\n     transition: all 0.2s ease;\r\n }\r\n+\r\n+.save-slot:hover:not(.empty) {\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1741025967911,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -548,4 +548,6 @@\n \r\n input:checked + .toggle-display:before {\r\n     transform: translateX(24px);\r\n }\r\n+\r\n+/* Select */\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1741025796992,
+            "name": "Commit-0",
+            "content": "@font-face {\r\n    font-family: 'NeoGothic';\r\n    src: url('../assets/fonts/neogothic.woff2') format('woff2');\r\n    font-weight: normal;\r\n    font-style: normal;\r\n}\r\n\r\n:root {\r\n    --menu-frame-color: rgba(41, 80, 120, 0.8);\r\n    --text-glow-color: rgba(0, 195, 255, 0.5);\r\n    --text-color: #e0f2ff;\r\n    --accent-color: #00c3ff;\r\n    --background-color: #080818;\r\n    --mist-opacity: 0.3;\r\n    --background-blur: 0.15;\r\n    \r\n    /* Colores para especializaciones */\r\n    --red-color: #ff3a4a;\r\n    --blue-color: #1fa7ff;\r\n    --purple-color: #a742ff;\r\n    \r\n    /* Variables de animación */\r\n    --menu-transition: 0.3s cubic-bezier(0.23, 1, 0."
+        }
+    ]
+}

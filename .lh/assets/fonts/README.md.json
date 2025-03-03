@@ -1,0 +1,18 @@
+{
+    "sourceFile": "assets/fonts/README.md",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1741026171372,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1741026171372,
+            "name": "Commit-0",
+            "content": "# Fuentes necesarias para Cybervania\r\n\r\nEl sistema de menú requiere la siguiente fuente:\r\n\r\n- `neogothic.woff2` - Una fuente gótica con estética digital para todo el juego\r\n\r\nSi no tienes esta fuente, puedes reemplazarla por una similar o modificar el CSS para usar:\r\n```css\r\nfont-family: 'Cinzel', 'Times New Roman', serif;\r\n```\r\n\r\nY agregar la importación de Google Fonts al inicio del archivo CSS:\r\n```css\r\n@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');\r\n```\r\n"
+        }
+    ]
+}

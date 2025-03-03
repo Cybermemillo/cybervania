@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybervania - Juego</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #080818;
+            color: #e0f2ff;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        
+        #game-container {
+            max-width: 800px;
+        }
+        
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(0, 195, 255, 0.5);
+        }
+        
+        .player-info {
+            background: rgba(20, 40, 70, 0.6);
+            border: 1px solid rgba(41, 80, 120, 0.8);
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background: linear-gradient(to bottom, rgba(0, 150, 200, 0.8), rgba(0, 100, 150, 0.8));
+            color: #e0f2ff;
+            border: 1px solid rgba(41, 80, 120, 0.8);
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(to bottom, rgba(0, 180, 230, 0.8), rgba(0, 120, 180, 0.8));
+            box-shadow: 0 0 8px rgba(0, 195, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>¡Partida Iniciada!</h1>
+        
+        <div class="player-info" id="player-info">
+            <!-- Esta información se completará con JS -->
+        </div>
+        
+        <div>
+            <p>La implementación real del juego iría aquí.</p>
+            <button class="btn" onclick="window.location.href='index.html'">Volver al Menú</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Obtener los datos del jugador desde localStorage
+            const playerData = localStorage.getItem('current_player');
+            
+            if (playerData) {
+                try {
+                    const player = JSON.parse(playerData);
+                    
+                    // Mostrar datos básicos del jugador
+                    document.getElementById('player-info').innerHTML = `
+                        <h2>Hacker: ${player.name}</h2>
+                        <p><strong>Especialización:</strong> ${getSpecName(player.specialization)}</p>
+                        <p><strong>Salud:</strong> ${player.health}/${player.maxHealth}</p>
+                        <p><strong>Créditos:</strong> ${player.credits}</p>
+                    `;
+                } catch (e) {
+                    console.error('Error al cargar datos del jugador:', e);
+                    document.getElementById('player-info').innerHTML = '<p>Error al cargar datos del jugador</p>';
+                }
+            } else {
+                document.getElementById('player-info').innerHTML = '<p>No hay datos de jugador. Inicia una nueva partida.</p>';
+            }
+            
+            // Función para obtener nombre legible de especialización
+            function getSpecName(specId) {
+                switch(specId) {
+                    case 'red': return 'Ofensivo';
+                    case 'blue': return 'Defensivo';
+                    case 'purple': return 'Equilibrado';
+                    default: return 'Desconocido';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

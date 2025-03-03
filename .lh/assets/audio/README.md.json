@@ -1,0 +1,22 @@
+{
+    "sourceFile": "assets/audio/README.md",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1741029673614,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1741032776715,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,17 +1,20 @@\n # Archivos de audio necesarios\r\n \r\n-Para que el sistema de audio funcione correctamente, crea la siguiente estructura de directorios y archivos:\r\n+Para que el sistema de audio funcione correctamente, asegúrate de tener los siguientes archivos:\r\n \r\n ## Efectos de sonido (SFX)\r\n - `/assets/audio/sfx/menu_hover.mp3` - Sonido suave al pasar sobre opciones del menú\r\n - `/assets/audio/sfx/menu_select.mp3` - Sonido al seleccionar una opción del menú\r\n - `/assets/audio/sfx/menu_back.mp3` - Sonido al volver atrás o cancelar\r\n+- `/assets/audio/sfx/main-theme.mp3` - Música principal del menú\r\n \r\n-## Música\r\n-- `/assets/audio/music/menu_theme.mp3` - Música de fondo para el menú principal\r\n+## Estructura alternativa (si prefieres organizarlos en carpetas separadas)\r\n+Si prefieres una organización más estructurada, puedes mover los archivos así:\r\n+- `/assets/audio/sfx/` - Efectos de sonido\r\n+- `/assets/audio/music/` - Archivos de música\r\n \r\n-Si no tienes estos archivos, puedes usar temporalmente cualquier archivo de audio compatible, renombrándolos según esta estructura.\r\n+En ese caso, recuerda actualizar las rutas en `MainMenu.js` para que coincidan con la nueva organización.\r\n \r\n ### Sugerencia para archivos temporales:\r\n Para pruebas, puedes generar sonidos simples desde páginas web como:\r\n - https://onlinetonegenerator.com/\r\n"
+                }
+            ],
+            "date": 1741029673614,
+            "name": "Commit-0",
+            "content": "# Archivos de audio necesarios\r\n\r\nPara que el sistema de audio funcione correctamente, crea la siguiente estructura de directorios y archivos:\r\n\r\n## Efectos de sonido (SFX)\r\n- `/assets/audio/sfx/menu_hover.mp3` - Sonido suave al pasar sobre opciones del menú\r\n- `/assets/audio/sfx/menu_select.mp3` - Sonido al seleccionar una opción del menú\r\n- `/assets/audio/sfx/menu_back.mp3` - Sonido al volver atrás o cancelar\r\n\r\n## Música\r\n- `/assets/audio/music/menu_theme.mp3` - Música de fondo para el menú principal\r\n\r\nSi no tienes estos archivos, puedes usar temporalmente cualquier archivo de audio compatible, renombrándolos según esta estructura.\r\n\r\n### Sugerencia para archivos temporales:\r\nPara pruebas, puedes generar sonidos simples desde páginas web como:\r\n- https://onlinetonegenerator.com/\r\n"
+        }
+    ]
+}

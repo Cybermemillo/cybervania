@@ -1,0 +1,63 @@
+/**
+ * Estilos específicos para cada idioma
+ * Estos estilos se activan según la clase lang-XX en el body
+ */
+
+/* Ajustes para inglés */
+body.lang-en .menu-text {
+    letter-spacing: 0.5px; /* Reducir espaciado para texto en inglés */
+}
+
+body.lang-en .title-container h2 {
+    letter-spacing: 3px; /* Ajustar el subtítulo en inglés */
+}
+
+/* El idioma inglés suele tener palabras más cortas, así que podemos aprovechar 
+   para mostrar elementos con mejor espaciado */
+body.lang-en .option-item label {
+    min-width: 130px; /* En inglés, las etiquetas suelen ser más cortas */
+}
+
+/* Ajustes para francés */
+body.lang-fr .menu-text {
+    font-size: 17px; /* Reducir ligeramente para textos más largos */
+    letter-spacing: 0.5px;
+}
+
+body.lang-fr .option-item label {
+    min-width: 150px; /* Las etiquetas en francés suelen ser más largas */
+    font-size: 15px;
+}
+
+body.lang-fr button {
+    font-size: 15px; /* El francés suele necesitar más espacio */
+}
+
+/* Ajustes para select element que puede desbordarse con textos largos */
+body.lang-fr select {
+    width: 200px; /* Más ancho para acomodar textos largos en francés */
+}
+
+/* Ajustes para el español (idioma por defecto) */
+body.lang-es .menu-text {
+    letter-spacing: 1px; /* El valor predeterminado */
+}
+
+/* Ajustes para longitudes de texto en diferentes idiomas */
+body.lang-fr .spec-card p {
+    font-size: 13px; /* El francés necesita letras más pequeñas para las descripciones */
+    line-height: 1.3;
+}
+
+/* Ajustes para texto muy largo en cualquier idioma */
+.text-overflow-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Encabezados más largos en opciones con idiomas distintos */
+body:not(.lang-es) .options-section h4 {
+    font-size: 17px;
+    padding: 8px 10px;
+}

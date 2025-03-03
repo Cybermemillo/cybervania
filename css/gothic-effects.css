@@ -1,0 +1,260 @@
+/* Archivo adicional de estilos para efectos gótico-cyberpunk de Cybervania */
+
+/* Estilos para las gárgolas ornamentales */
+.gargoyle-ornament {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    z-index: 20;
+    opacity: 0.6;
+    filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.5));
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.gargoyle-ornament.top-left {
+    top: 10px;
+    left: 10px;
+}
+
+.gargoyle-ornament.top-right {
+    top: 10px;
+    right: 10px;
+}
+
+.gargoyle-ornament.bottom-left {
+    bottom: 10px;
+    left: 10px;
+}
+
+.gargoyle-ornament.bottom-right {
+    bottom: 10px;
+    right: 10px;
+}
+
+.gargoyle-ornament:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.gargoyle-ornament.awakened {
+    filter: drop-shadow(0 0 5px rgba(255, 34, 136, 0.5));
+}
+
+/* Pentagrama digital */
+.cyber-pentagram {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+    z-index: 1;
+    pointer-events: none;
+    transition: opacity 1s ease, transform 1s ease;
+}
+
+.cyber-pentagram.reveal {
+    opacity: 0.15;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.pentagram-outline {
+    animation: pentagram-pulse 10s infinite alternate;
+}
+
+@keyframes pentagram-pulse {
+    0% { stroke-width: 0.5; stroke-opacity: 0.3; }
+    50% { stroke-width: 1; stroke-opacity: 0.5; }
+    100% { stroke-width: 0.5; stroke-opacity: 0.3; }
+}
+
+/* Manchas de sangre digitales */
+.blood-splatter {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+    filter: hue-rotate(330deg) contrast(1.2);
+    mix-blend-mode: multiply;
+}
+
+/* Glow ritual alrededor de los elementos del menú */
+.ritual-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    pointer-events: none;
+    z-index: -1;
+    box-shadow: inset 0 0 30px rgba(191, 155, 48, 0.2);
+    border-radius: inherit;
+}
+
+/* Símbolos arcanos en fondos */
+.arcane-symbols {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* Relámpagos ambientales */
+.ambient-lightning {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0);
+    pointer-events: none;
+    z-index: 200;
+    opacity: 0;
+    transition: all 0.1s ease;
+}
+
+.ambient-lightning.flash {
+    opacity: 0;
+    animation: lightning-flash 1.5s ease-out;
+}
+
+@keyframes lightning-flash {
+    0% { background: rgba(255, 255, 255, 0); opacity: 0; }
+    10% { background: rgba(150, 195, 255, 0.1); opacity: 0.8; }
+    11% { background: rgba(255, 255, 255, 0); opacity: 0; }
+    14% { background: rgba(150, 195, 255, 0.1); opacity: 0.3; }
+    15% { background: rgba(255, 255, 255, 0); opacity: 0; }
+    100% { background: rgba(255, 255, 255, 0); opacity: 0; }
+}
+
+/* Efecto de texto sangriento */
+.bloody-text {
+    color: #f0e2ff;
+    text-shadow: 0 0 5px rgba(138, 3, 3, 0.7);
+    position: relative;
+}
+
+.blood-drop {
+    position: absolute;
+    bottom: -5px;
+    width: 2px;
+    height: 10px;
+    background: linear-gradient(to bottom, rgba(138, 3, 3, 0.7), rgba(138, 3, 3, 0));
+    border-radius: 50% 50% 0 0;
+    animation: drip 3s infinite;
+}
+
+@keyframes drip {
+    0% { height: 0; opacity: 0; }
+    30% { height: 10px; opacity: 0.7; }
+    70% { height: 15px; opacity: 0.5; }
+    100% { height: 20px; opacity: 0; }
+}
+
+/* Efectos de distorsión VHS */
+.vhs-distortion {
+    position: relative;
+    overflow: hidden;
+}
+
+.vhs-noise {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    mix-blend-mode: screen;
+    pointer-events: none;
+}
+
+.vhs-scanlines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom,
+        transparent 50%,
+        rgba(0, 0, 0, 0.05) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+}
+
+.vhs-glitch {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    animation: random-glitch 10s infinite;
+}
+
+@keyframes random-glitch {
+    0% { opacity: 0; transform: translateX(0); }
+    1% { opacity: 0.2; transform: translateX(-5px); }
+    1.5% { opacity: 0; transform: translateX(0); }
+    10% { opacity: 0; }
+    10.5% { opacity: 0.1; }
+    11% { opacity: 0; }
+    30% { opacity: 0; }
+    30.5% { opacity: 0.2; transform: translateX(3px); }
+    31% { opacity: 0; transform: translateX(0); }
+    98% { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+/* Viñeta oscura pulsante */
+.dark-vignette {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    background: radial-gradient(
+        ellipse at center,
+        transparent 60%,
+        rgba(0, 0, 0, 0.4) 100%
+    );
+    opacity: 0.7;
+    transition: opacity 3s ease;
+}
+
+.dark-vignette.pulse {
+    opacity: 0.9;
+}
+
+/* Parpadeo de luces de neón */
+.neon-flicker {
+    animation: neon-flicker-effect 4s infinite;
+}
+
+@keyframes neon-flicker-effect {
+    0%, 19%, 21%, 23%, 54%, 56%, 91%, 100% {
+        text-shadow: 0 0 5px var(--text-glow-color),
+                     0 0 10px var(--text-glow-color),
+                     0 0 15px var(--text-glow-color);
+        opacity: 1;
+    }
+    20%, 55%, 92% {
+        text-shadow: none;
+        opacity: 0.8;
+    }
+}
+
+/* Cursor personalizado gótico */
+.cursor-gothic {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12,0 L14,10 L24,12 L14,14 L12,24 L10,14 L0,12 L10,10 Z' fill='%23ff2288' fill-opacity='0.7' stroke='%23f0e2ff' stroke-width='0.5'/%3E%3C/svg%3E")
+          12 12,
+        auto;
+}

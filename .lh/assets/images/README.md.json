@@ -1,0 +1,22 @@
+{
+    "sourceFile": "assets/images/README.md",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1741026171372,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1741026371238,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n # Archivos de imagen necesarios\r\n \r\n-Para que el menú funcione correctamente, asegúrate de que los siguientes archivos estén en este directorio:\r\n+Para que el menú funcione correctamente, asegúrate de que los siguientes archivos estén en sus directorios correspondientes:\r\n \r\n-1. `castle-background.jpg` - Fondo principal del menú (un castillo con estilo gótico-cyberpunk)\r\n+1. `backgrounds/menu_bg.jpg` - Fondo principal del menú (un castillo con estilo gótico-cyberpunk)\r\n 2. `favicon.png` - Ícono para la pestaña del navegador (idealmente un símbolo de Cybervania)\r\n \r\n Si no tienes estas imágenes, puedes usar temporalmente cualquier imagen oscura de fondo para el castillo y un favicon básico.\r\n"
+                }
+            ],
+            "date": 1741026171372,
+            "name": "Commit-0",
+            "content": "# Archivos de imagen necesarios\r\n\r\nPara que el menú funcione correctamente, asegúrate de que los siguientes archivos estén en este directorio:\r\n\r\n1. `castle-background.jpg` - Fondo principal del menú (un castillo con estilo gótico-cyberpunk)\r\n2. `favicon.png` - Ícono para la pestaña del navegador (idealmente un símbolo de Cybervania)\r\n\r\nSi no tienes estas imágenes, puedes usar temporalmente cualquier imagen oscura de fondo para el castillo y un favicon básico.\r\n"
+        }
+    ]
+}
