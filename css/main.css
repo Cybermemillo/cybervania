@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Pirata+One&display=swap');
+
+:root {
+    --primary: #8b0000;
+    --secondary: #4b0082;
+    --accent: #32cd32;
+    --background: #0f0f1e;
+    --text: #f8f8f2;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--background);
+    color: var(--text);
+    font-family: 'Pirata One', cursive;
+    overflow: hidden;
+}
+
+.font-gothic {
+    font-family: 'Pirata One', cursive;
+}
+
+.card {
+    width: 200px;
+    height: 280px;
+    background-color: rgba(15, 15, 30, 0.85);
+    border: 2px solid var(--primary);
+    border-radius: 10px;
+    padding: 10px;
+    position: relative;
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-10px) scale(1.05);
+    border-color: var(--accent);
+    box-shadow: 0 0 15px rgba(50, 205, 50, 0.5);
+}
+
+.card-title {
+    color: var(--primary);
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.card-cost {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background-color: var(--primary);
+    color: var(--text);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.enemy {
+    filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.7));
+}
+
+.boss {
+    filter: drop-shadow(0 0 20px rgba(255, 0, 0, 0.9));
+}
+
+/* Animaciones */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cybervania</title>
+    <link rel="stylesheet" href="css/main.css">
+    
+    <!-- Disable Tailwind warning about production use -->
+    <script>window.tailwindConfig = { hideConfigWorkerWarning: true }</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- External libraries sin integrity check para evitar problemas -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    
+    <!-- Preconectar a dominios externos -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+</head>
+<body class="bg-black text-white overflow-hidden">
+    <!-- Audio context unlock indicator -->
+    <div id="audio-indicator" class="fixed top-2 right-2 bg-red-800 text-white px-4 py-2 rounded opacity-0 transition-opacity duration-500">
+        Haz clic para activar audio
+    </div>
+    
+    <div id="game-container" class="w-full h-screen flex justify-center items-center">
+        <!-- El juego se renderizará aquí -->
+    </div>
+    
+    <div id="loading-screen" class="fixed top-0 left-0 w-full h-full bg-black flex justify-center items-center z-50">
+        <div class="text-center">
+            <h1 class="text-4xl font-gothic mb-4 text-red-600">CYBERVANIA</h1>
+            <div class="w-64 h-4 bg-gray-800 rounded-full">
+                <div id="loading-bar" class="h-4 bg-red-600 rounded-full" style="width: 0%"></div>
+            </div>
+            <p id="loading-text" class="mt-2 text-gray-400">Cargando...</p>
+            <button id="start-button" class="hidden mt-4 px-4 py-2 bg-red-800 text-white rounded">
+                Iniciar Juego
+            </button>
+        </div>
+    </div>
+    
+    <!-- Script para activar audio -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar que Phaser esté cargado
+            if (typeof Phaser === 'undefined') {
+                console.error('Phaser no está cargado correctamente. Reintentando...');
+                // Cargar Phaser dinámicamente como último recurso
+                const phaserScript = document.createElement('script');
+                phaserScript.src = "https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js";
+                phaserScript.onload = function() {
+                    console.log('Phaser cargado manualmente');
+                    initAudio();
+                    loadGame();
+                };
+                document.head.appendChild(phaserScript);
+            } else {
+                initAudio();
+                loadGame();
+            }
+            
+            function initAudio() {
+                // Mostrar indicador de audio si es necesario
+                if (window.AudioContext || window.webkitAudioContext) {
+                    const audioIndicator = document.getElementById('audio-indicator');
+                    audioIndicator.classList.remove('opacity-0');
+                    
+                    document.addEventListener('click', function() {
+                        audioIndicator.classList.add('opacity-0');
+                        
+                        // Asegurarse de que tanto Howler como Phaser tengan audio
+                        if (window.Howler && Howler.ctx && Howler.ctx.state !== 'running') {
+                            Howler.ctx.resume().catch(function(err) {
+                                console.warn('Error resumiendo contexto de audio:', err);
+                            });
+                        }
+                        
+                        if (window.game && window.game.sound && window.game.sound.context && 
+                            window.game.sound.context.state !== 'running') {
+                            window.game.sound.context.resume().catch(function(err) {
+                                console.warn('Error resumiendo contexto de audio de Phaser:', err);
+                            });
+                        }
+                    }, { once: true });
+                }
+            }
+            
+            function loadGame() {
+                // Verificar carga de scripts antes de iniciar el juego
+                const requiredGlobals = ['Phaser', 'Howler'];
+                const missing = requiredGlobals.filter(name => typeof window[name] === 'undefined');
+                
+                if (missing.length > 0) {
+                    console.error('Faltan dependencias:', missing.join(', '));
+                    document.getElementById('loading-text').textContent = 
+                        'Error: No se pudieron cargar todas las dependencias. Recarga la página.';
+                    return;
+                }
+                
+                // Carga de app.js con script dinámico para asegurar que se cargue después de dependencias
+                const appScript = document.createElement('script');
+                appScript.src = "js/app.js";
+                appScript.type = "module";
+                document.body.appendChild(appScript);
+                
+                // Botón de inicio alternativo para desbloquear audio
+                const startButton = document.getElementById('start-button');
+                window.addEventListener('load', function() {
+                    // Si la carga se completa mostrar botón de inicio
+                    startButton.classList.remove('hidden');
+                    startButton.addEventListener('click', function() {
+                        document.getElementById('loading-screen').style.display = 'none';
+                        document.getElementById('audio-indicator').classList.add('opacity-0');
+                        
+                        if (window.Howler && Howler.ctx && Howler.ctx.state !== 'running') {
+                            Howler.ctx.resume().catch(console.error);
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
