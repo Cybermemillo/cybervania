@@ -1,0 +1,1092 @@
+/**
+ * CYBERVANIA - CSS PRINCIPAL
+ * Estilo: Gótico Cyberpunk con gráficos de 16-bits SNES
+ * Inspiración: Castlevania, Contra, Shadowrun
+ */
+
+/* -------------- CONFIGURACIÓN GLOBAL -------------- */
+@font-face {
+    font-family: 'Anemouth';
+    src: url('../assets/fonts/Anemouth.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Mantenemos la fuente pixel por si acaso se necesita para algún elemento */
+@font-face {
+    font-family: 'PressStart2P';
+    src: url('../assets/fonts/PressStart2P-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Paleta de colores GÓTICA con toques de 16-bits */
+:root {
+    /* Colores góticos principales */
+    --gothic-black: #0a0205;          /* Negro absoluto con toque rojizo */
+    --gothic-dark: #1a0505;           /* Oscuro sangriento */
+    --gothic-crimson: #430e0e;        /* Carmesí más sutil */
+    --gothic-wine: #4d0f1c;           /* Vino oscuro */
+    --gothic-purple: #35102a;         /* Púrpura oscuro */
+    --gothic-deep-purple: #2d0245;    /* Púrpura profundo */
+    --gothic-gold: #c8aa6e;           /* Dorado antiguo */
+    --gothic-brass: #b08d57;          /* Latón oxidado */
+    --gothic-bone: #e8dacb;           /* Hueso pálido */
+    
+    /* Acentos de 16-bits con toque oscuro */
+    --retro-dark-red: #400000;        /* Rojo oscuro más sutil */
+    --retro-pink: #ff3860;            /* Toque de rosa para resaltes */
+    --retro-purple: #8f0a93;          /* Púrpura SNES más saturado */
+    --retro-teal: #005e60;            /* Verde azulado oscuro */
+    --retro-metal: #566c86;           /* Gris metálico */
+    --retro-shadow: #0f111a;          /* Sombra profunda */
+    --retro-ivory: #d8c8b8;           /* Marfil antiguo */
+
+    /* Colores SNES reajustados para ser más góticos */
+    --snes-black: #000000;
+    --snes-dark-blue: #1a0533;        /* Azul-púrpura oscuro */
+    --snes-dark-purple: #250a36;      /* Púrpura más oscuro */
+    --snes-purple: #4a0852;           /* Púrpura intenso */
+    --snes-red: #780000;              /* Rojo más oscuro */
+    --snes-orange: #9e3800;           /* Naranja oxidado */
+    --snes-yellow: #ac8032;           /* Amarillo más apagado/dorado */
+    --snes-green: #1e5945;            /* Verde más oscuro */
+    --snes-blue: #242e52;             /* Azul oscuro nocturno */
+    --snes-light-blue: #4a5582;       /* Azul más grisáceo */
+    --snes-dark-gray: #1c1621;        /* Gris casi negro con tinte púrpura */
+    --snes-gray: #3a3a45;             /* Gris medio */
+    --snes-light-gray: #94b0c2;       /* Se mantiene para contraste */
+    --snes-white: #d0c8c0;            /* Blanco más cremoso/antiguo */
+
+    /* Configuración de elementos */
+    --main-bg: var(--gothic-black);
+    --menu-bg: rgba(10, 2, 5, 0.85);  /* Negro rojizo semitransparente */
+    --border-color: var(--gothic-wine);
+    --border-glow: var(--gothic-crimson);
+    --text-color: var(--gothic-bone);
+    --title-color: var(--gothic-gold);
+    --accent-color: var(--gothic-crimson);
+    --highlight-color: var(--gothic-wine);
+    
+    /* Diseño */
+    --pixel-size: 4px;
+    --border-width: var(--pixel-size);
+    --shadow-distance: var(--pixel-size);
+    --header-font: 'Anemouth', serif;
+    --body-font: 'Anemouth', serif;
+    
+    /* Dimensiones - aumentando tamaños */
+    --menu-width: 1000px; /* Aumentado de 800px a 1000px */
+    --menu-max-width: 95%; /* Aumentado de 90% a 95% */
+}
+
+/* -------------- RESET Y BASE -------------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+body {
+    background-color: var(--main-bg);
+    color: var(--text-color);
+    font-family: var(--body-font);
+    line-height: 1.6; /* Aumentado para más espaciado entre líneas */
+    overflow-x: hidden;
+    font-size: 20px; /* Aumentado de 18px a 20px */
+    letter-spacing: 0.6px; /* Ligeramente más espaciado entre letras */
+    font-smooth: never;
+    -webkit-font-smoothing: none;
+}
+
+/* -------------- CONTENEDOR PRINCIPAL -------------- */
+#menu-container {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 2rem 0;
+    overflow: hidden;
+    /* Cambiamos el fondo a menu_bg.jpg */
+    background: url('../assets/images/backgrounds/menu_bg.jpg') center center no-repeat;
+    background-size: cover;
+    z-index: 0;
+}
+
+/* Capa de escáner CRT */
+#menu-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(
+            to bottom,
+            transparent, 
+            rgba(18, 16, 16, 0.1) 50%, 
+            transparent 50%, 
+            transparent
+        );
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0.4;
+    animation: scanline 10s linear infinite;
+}
+
+/* Viñeta oscura */
+#menu-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        circle at center,
+        transparent 40%,
+        rgba(10, 2, 5, 0.65) 140%  /* Un poco menos intenso */
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* -------------- TÍTULO -------------- */
+.title-container {
+    position: relative;
+    text-align: center;
+    margin-bottom: 3rem; /* Aumentado de 2rem a 3rem para más espacio */
+    transform-style: preserve-3d;
+    z-index: 5; /* Encima de todo para asegurar visibilidad */
+    text-shadow: 0 0 15px rgba(0, 0, 0, 0.7); /* Sombra para legibilidad */
+    padding: 1.5rem; /* Aumentado de 1rem a 1.5rem */
+    background-color: rgba(9, 10, 16, 0.4); /* Fondo semi-transparente */
+    border-radius: 4px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px); /* Efecto de desenfoque para el fondo */
+}
+
+.title-container h1 {
+    font-family: var(--header-font);
+    font-size: 5rem; /* Aumentado de 4rem a 5rem */
+    color: var(--gothic-bone);  /* Color base más pálido */
+    text-transform: uppercase;
+    letter-spacing: 8px; /* Mayor espaciado para títulos góticos */
+    margin-bottom: 0.5rem;
+    position: relative;
+    text-shadow: 
+        var(--shadow-distance) var(--shadow-distance) 0 var(--gothic-black),
+        calc(var(--shadow-distance) * -1) calc(var(--shadow-distance) * -1) 0 var(--gothic-wine);
+    animation: gothic-title-pulse 4s infinite alternate;
+}
+
+.title-container h1::before {
+    content: attr(data-text);
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    color: var(--gothic-crimson);  /* Color menos intenso */
+    opacity: 0.5; /* Más sutil */
+    z-index: -1;
+}
+
+.title-container h2 {
+    font-family: var(--body-font);
+    font-size: 1.4rem; /* Aumentado de 1.2rem a 1.4rem */
+    color: var(--gothic-brass);  /* Subtítulo en color latón */
+    text-shadow: var(--shadow-distance) var(--shadow-distance) 0 var(--gothic-black);
+    animation: gothic-glow 2s ease-in-out infinite alternate;
+}
+
+/* -------------- SCREEN CONTAINER -------------- */
+.screen-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3; /* Mayor que el after del menu-container */
+}
+
+/* Añadir una capa para mejorar visualización de elementos UI */
+.screen-container:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(9, 10, 16, 0.2); /* Sombra sutil para mejorar contraste */
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* -------------- MENÚ PANTALLAS -------------- */
+.menu-screen {
+    display: none;
+    background-color: var(--menu-bg);
+    width: var(--menu-width);
+    max-width: var(--menu-max-width);
+    padding: 2.5rem; /* Aumentado de 2rem a 2.5rem para más espacio interno */
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    transform: translateY(20px);
+    border-image: url('../assets/images/borders/gothic_border.png') 4 repeat;  /* Cambiado a un borde gótico neutro */
+    border-width: 10px; /* Aumentado de 8px a 10px para un borde más visible */
+    border-style: solid;
+    box-shadow:
+        0 0 0 var(--border-width) var(--gothic-wine),
+        0 0 10px 0 var(--gothic-crimson),
+        inset 0 0 15px rgba(0, 0, 0, 0.7);
+}
+
+.menu-screen::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--border-width) * -1);
+    left: calc(var(--border-width) * -1);
+    right: calc(var(--border-width) * -1);
+    bottom: calc(var(--border-width) * -1);
+    border: var(--border-width) solid var(--border-color);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.menu-screen.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    animation: screen-appear 0.5s ease forwards;
+}
+
+/* Títulos de pantalla */
+.menu-screen h3 {
+    font-family: var(--header-font);
+    font-size: 2.2rem; /* Aumentado de 1.8rem a 2.2rem */
+    color: var(--gothic-gold);
+    text-align: center;
+    margin-bottom: 2rem; /* Aumentado de 1.5rem a 2rem */
+    padding-bottom: 1.2rem; /* Aumentado de 1rem a 1.2rem */
+    text-transform: uppercase;
+    letter-spacing: 3px; /* Mayor espaciado para títulos góticos */
+    position: relative;
+    text-shadow: 2px 2px 0 var(--cyber-dark);
+}
+
+/* -------------- MENÚ PRINCIPAL -------------- */
+.menu-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0; /* Aumentado de 1rem a 1.5rem */
+}
+
+.menu-item {
+    background-color: rgba(26, 5, 20, 0.7);  /* Menos rojizo, más púrpura */
+    margin: 1rem 0; /* Aumentado de 0.75rem a 1rem */
+    padding: 1rem 1.2rem; /* Aumentado de 0.75rem 1rem a 1rem 1.2rem */
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    border-style: solid;
+    border-width: var(--pixel-size);
+    border-color: var(--gothic-wine);
+    position: relative;
+    transition: all 0.1s step-end;
+}
+
+.menu-item:hover {
+    background-color: rgba(45, 15, 45, 0.8);  /* Más púrpura que rojo */
+    border-color: var(--gothic-crimson);
+    transform: translate(2px, 2px);
+    box-shadow: 
+        -2px -2px 0 var(--gothic-crimson),
+        -4px -4px 0 rgba(0, 0, 0, 0.5);
+}
+
+.menu-item::before {
+    content: '';
+    position: absolute;
+    left: -16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 6px solid var(--gothic-crimson);
+    opacity: 0;
+    transition: opacity 0.1s step-end;
+}
+
+.menu-item:hover::before {
+    opacity: 1;
+    animation: arrow-blink 0.5s step-end infinite;
+}
+
+.menu-icon {
+    margin-right: 1.5rem; /* Aumentado de 1rem a 1.5rem */
+    color: var(--accent-color);
+    font-size: 1.4rem; /* Aumentado de 1.2rem a 1.4rem */
+}
+
+.menu-text {
+    font-family: var(--body-font);
+    font-size: 1.5rem; /* Aumentado de 1.2rem a 1.5rem */
+    color: var(--snes-light-gray);
+}
+
+/* -------------- FORMULARIOS -------------- */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.7rem; /* Aumentado de 0.5rem a 0.7rem */
+    color: var(--gothic-gold);
+    font-size: 1.3rem; /* Aumentado de 1.1rem a 1.3rem */
+}
+
+input[type="text"], 
+input[type="password"], 
+textarea, 
+select {
+    width: 100%;
+    padding: 0.9rem; /* Aumentado de 0.75rem a 0.9rem */
+    background-color: rgba(26, 11, 34, 0.8);
+    border: var(--pixel-size) solid var(--snes-dark-purple);
+    color: var(--snes-light-gray);
+    font-family: var(--body-font);
+    font-size: 1.2rem; /* Aumentado de 1rem a 1.2rem */
+}
+
+input:focus, 
+textarea:focus, 
+select:focus {
+    outline: none;
+    border-color: var(--cyber-pink);
+    box-shadow: 0 0 0 1px var(--cyber-pink);
+}
+
+input::placeholder, 
+textarea::placeholder {
+    color: rgba(148, 176, 194, 0.5);
+}
+
+/* Sliders */
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 12px;
+    background-color: var(--cyber-dark);
+    border: var(--pixel-size) solid var(--snes-dark-purple);
+    margin: 0.5rem 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 24px;
+    background-color: var(--cyber-pink);
+    cursor: pointer;
+    border: var(--pixel-size) solid var(--gothic-gold);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 24px;
+    background-color: var(--cyber-pink);
+    cursor: pointer;
+    border: var(--pixel-size) solid var(--gothic-gold);
+}
+
+/* Checkbox toggle */
+.toggle-wrapper {
+    position: relative;
+    width: 60px;
+    height: 30px;
+    display: inline-block;
+}
+
+.toggle-wrapper input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-display {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--cyber-dark);
+    border: var(--pixel-size) solid var(--snes-dark-purple);
+}
+
+.toggle-display:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 3px;
+    background-color: var(--gothic-gold);
+}
+
+input:checked + .toggle-display {
+    background-color: var(--cyber-purple);
+    border-color: var(--gothic-wine);
+}
+
+input:checked + .toggle-display:before {
+    transform: translateX(30px);
+    background-color: var(--cyber-pink);
+}
+
+/* -------------- BOTONES -------------- */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1.3rem; /* Aumentado de 1rem a 1.3rem */
+    margin-top: 2.5rem; /* Aumentado de 2rem a 2.5rem */
+}
+
+button {
+    cursor: pointer;
+    padding: 1rem 1.8rem; /* Aumentado de 0.75rem 1.5rem a 1rem 1.8rem */
+    font-family: var(--body-font);
+    font-size: 1.2rem; /* Aumentado de 1rem a 1.2rem */
+    text-transform: uppercase;
+    background-color: var(--gothic-purple);
+    color: var(--gothic-bone);
+    border: var(--pixel-size) solid var(--gothic-wine);
+    position: relative;
+    text-shadow: 1px 1px 0 var(--cyber-dark);
+    box-shadow: var(--pixel-size) var(--pixel-size) 0 rgba(0, 0, 0, 0.5);
+    letter-spacing: 1px; /* Mayor espaciado para estilo gótico */
+}
+
+button:hover {
+    background-color: var(--gothic-wine);
+    color: var(--gothic-bone);
+    border-color: var(--gothic-crimson);
+}
+
+button:active {
+    transform: translate(var(--pixel-size), var(--pixel-size));
+    box-shadow: none;
+}
+
+.main-button {
+    background-color: var(--gothic-crimson);
+}
+
+.main-button:hover {
+    background-color: var(--gothic-wine);
+    color: var(--snes-white);
+}
+
+.back-button {
+    background-color: var(--gothic-purple);
+}
+
+.back-button:hover {
+    background-color: var(--gothic-deep-purple);
+}
+
+.buttons-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+}
+
+.buttons-row button {
+    flex: 1;
+}
+
+.secondary-buttons {
+    margin-top: 0.5rem;
+}
+
+/* -------------- ESPECIALIZACIÓN CARDS -------------- */
+.specialization-container {
+    margin: 2rem 0; /* Aumentado de 1.5rem a 2rem */
+}
+
+.spec-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.3rem; /* Aumentado de 1rem a 1.3rem */
+    margin-top: 1.3rem; /* Aumentado de 1rem a 1.3rem */
+}
+
+.spec-card {
+    background-color: rgba(26, 11, 34, 0.8);
+    padding: 1.3rem; /* Aumentado de 1rem a 1.3rem */
+    border: var(--pixel-size) solid var(--cyber-dark);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.1s step-end;
+}
+
+.spec-card.red {
+    border-color: var(--gothic-crimson);
+}
+
+.spec-card.blue {
+    border-color: var(--snes-dark-blue);
+}
+
+.spec-card.purple {
+    border-color: var(--gothic-deep-purple);
+}
+
+.spec-card.selected {
+    background-color: var(--gothic-wine);
+    transform: translate(-4px, -4px);
+    box-shadow: 
+        var(--pixel-size) var(--pixel-size) 0 var(--cyber-dark),
+        calc(var(--pixel-size) * 2) calc(var(--pixel-size) * 2) 0 rgba(0, 0, 0, 0.5);
+}
+
+.spec-card.selected::before {
+    content: '▶';
+    position: absolute;
+    top: 0.5rem;
+    left: -1rem;
+    color: var(--gothic-gold);  /* Destello dorado para el selector */
+    animation: blink 1s step-end infinite;
+}
+
+.spec-card h5 {
+    font-family: var(--header-font);
+    color: var(--gothic-gold);
+    font-size: 1.4rem; /* Aumentado de 1.2rem a 1.4rem */
+    margin-bottom: 1rem; /* Aumentado de 0.75rem a 1rem */
+    text-transform: uppercase;
+    letter-spacing: 1px; /* Mayor espaciado para estilo gótico */
+}
+
+.spec-card p {
+    color: var(--snes-light-gray);
+    font-size: 1.1rem; /* Aumentado de 0.9rem a 1.1rem */
+    margin-bottom: 1.3rem; /* Aumentado de 1rem a 1.3rem */
+}
+
+.spec-stats {
+    background-color: rgba(9, 10, 16, 0.6);
+    padding: 0.9rem; /* Aumentado de 0.75rem a 0.9rem */
+    font-size: 0.9rem; /* Aumentado de 0.75rem a 0.9rem */
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.stat-name {
+    color: var (--snes-light-gray);
+}
+
+.stat-value {
+    color: var(--accent-color);
+}
+
+.stat-positive {
+    color: var(--snes-green);
+}
+
+.stat-negative {
+    color: var(--gothic-crimson);
+}
+
+/* -------------- VISTA PREVIA DEL PERSONAJE -------------- */
+.character-preview-container {
+    margin: 1.5rem 0;
+    border: var(--pixel-size) solid var(--border-color);
+    padding: 1rem;
+    background-color: rgba(26, 11, 34, 0.6);
+}
+
+.character-preview {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.character-avatar {
+    width: 80px;
+    height: 120px;
+    background-color: rgba(9, 10, 16, 0.8);
+    border: var(--pixel-size) solid var(--cyber-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.silhouette {
+    width: 95%;
+    height: 95%;
+}
+
+.character-details {
+    flex-grow: 1;
+}
+
+.preview-name {
+    color: var(--accent-color);
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.preview-class {
+    color: var(--gothic-gold);
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
+}
+
+.preview-description {
+    color: var(--snes-light-gray);
+    font-size: 0.75rem;
+}
+
+/* -------------- GENDER SELECTION -------------- */
+.gender-options {
+    display: flex;
+    gap: 1rem;
+    margin: 0.75rem 0;
+}
+
+.gender-option {
+    flex: 1;
+    padding: 0.75rem;
+    background-color: rgba(26, 11, 34, 0.8);
+    border: var(--pixel-size) solid var(--snes-dark-purple);
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.gender-option.selected {
+    background-color: rgba(50, 15, 85, 0.8);
+    border-color: var(--cyber-pink);
+    transform: translate(-2px, -2px);
+    box-shadow: 
+        var(--pixel-size) var(--pixel-size) 0 var(--cyber-dark),
+        calc(var(--pixel-size) * 2) calc(var(--pixel-size) * 2) 0 rgba(0, 0, 0, 0.5);
+}
+
+.gender-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.gender-option span {
+    color: var(--snes-light-gray);
+    font-size: 0.9rem;
+}
+
+.gender-option.selected span {
+    color: var(--gothic-gold);
+}
+
+/* -------------- OPTIONS SCREEN -------------- */
+.options-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+.options-section {
+    background-color: rgba(26, 11, 34, 0.6);
+    border: var(--pixel-size) solid var(--cyber-dark);
+    padding: 1rem;
+    position: relative;
+}
+
+.options-section h4 {
+    background-color: var(--cyber-dark);
+    color: var(--gothic-gold);
+    font-family: var(--header-font);
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    margin: -1rem -1rem 1rem;
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.option-item label {
+    flex: 1;
+    margin-bottom: 0;
+    min-width: 150px;
+}
+
+.option-item input,
+.option-item select {
+    flex: 2;
+    width: auto;
+}
+
+.option-value {
+    color: var(--accent-color);
+    font-size: 0.8rem;
+    width: 50px;
+    text-align: right;
+}
+
+/* -------------- LOAD GAME SCREEN -------------- */
+.save-slots-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.save-slot {
+    background-color: rgba(26, 11, 34, 0.6);
+    border: var(--pixel-size) solid var(--cyber-dark);
+    padding: 1rem;
+    cursor: pointer;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+}
+
+.save-slot:hover {
+    border-color: var(--gothic-crimson);
+    transform: translate(-2px, -2px);
+    box-shadow: 
+        var(--pixel-size) var(--pixel-size) 0 var(--cyber-dark),
+        calc(var(--pixel-size) * 2) calc(var(--pixel-size) * 2) 0 rgba(0, 0, 0, 0.5);
+}
+
+.save-slot.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+    opacity: 0.7;
+}
+
+.save-slot.empty:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.slot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.slot-header h4 {
+    color: var(--gothic-gold);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.slot-date {
+    color: var(--snes-light-gray);
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.slot-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.spec-badge {
+    background-color: var(--cyber-dark);
+    color: var (--snes-light-gray);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border: 2px solid var(--cyber-dark);
+}
+
+.spec-badge.red {
+    border-color: var(--gothic-crimson);
+}
+
+.spec-badge.blue {
+    border-color: var(--cyber-blue);
+}
+
+.spec-badge.purple {
+    border-color: var(--gothic-deep-purple);
+}
+
+.level-info {
+    color: var(--accent-color);
+    font-size: 0.75rem;
+}
+
+.empty-slot-text {
+    color: var(--snes-gray);
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+/* -------------- NOTIFICACIONES -------------- */
+.notification {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem;
+    background-color: rgba(26, 11, 34, 0.9);
+    border: var(--pixel-size) solid var(--border-glow);
+    color: var(--snes-white);
+    font-size: 0.85rem;
+    z-index: 100;
+    text-align: center;
+    min-width: 300px;
+    box-shadow: 
+        0 0 5px var(--border-glow),
+        0 0 10px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* -------------- FONDO ANIMADO -------------- */
+.pixel-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2; /* Por encima del fondo pero por debajo de los elementos UI */
+    pointer-events: none;
+}
+
+.pixel {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background-color: var(--cyber-pink);
+    opacity: 0.5;
+}
+
+/* -------------- ANIMACIONES -------------- */
+@keyframes screen-appear {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes gothic-title-pulse {
+    0% {
+        text-shadow: 
+            2px 2px 0px var(--gothic-black),
+            -2px -2px 0px var(--gothic-wine);
+    }
+    50% {
+        text-shadow: 
+            2px 2px 0px var(--gothic-black),
+            -2px -2px 0px var(--gothic-wine),
+            0 0 15px var(--gothic-crimson);
+    }
+    100% {
+        text-shadow: 
+            2px 2px 0px var(--gothic-black),
+            -2px -2px 0px var(--gothic-wine);
+    }
+}
+
+@keyframes gothic-glow {
+    0% {
+        color: var(--gothic-brass);
+        text-shadow: 2px 2px 0px var(--gothic-black);
+    }
+    100% {
+        color: var(--gothic-gold);
+        text-shadow: 2px 2px 0px var(--gothic-black), 0 0 8px var(--gothic-brass);
+    }
+}
+
+@keyframes subtitle-glow {
+    0% {
+        color: var(--accent-color);
+        text-shadow: 2px 2px 0px var(--cyber-dark);
+    }
+    100% {
+        color: var(--snes-light-blue);
+        text-shadow: 2px 2px 0px var(--cyber-dark), 0 0 5px var(--cyber-teal);
+    }
+}
+
+@keyframes blink {
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0;
+    }
+}
+
+@keyframes arrow-blink {
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes scanline {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 0 100%;
+    }
+}
+
+/* -------------- MEDIA QUERIES -------------- */
+@media (min-width: 768px) {
+    .options-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .screen-container {
+        padding: 0 2rem;
+    }
+    
+    .title-container h1 {
+        font-size: 6rem; /* Aumentado de 5rem a 6rem */
+    }
+}
+
+@media (max-width: 767px) {
+    .gender-options {
+        flex-direction: column;
+    }
+    
+    .spec-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .buttons-row {
+        flex-direction: column;
+    }
+    
+    .title-container h1 {
+        font-size: 3.5rem; /* Aumentado de 3rem a 3.5rem */
+    }
+    
+    .title-container h2 {
+        font-size: 1.3rem; /* Aumentado de 1.1rem a 1.3rem */
+    }
+
+    .menu-text {
+        font-size: 1.3rem; /* Tamaño específico para móvil */
+    }
+    
+    .menu-screen {
+        padding: 1.8rem; /* Ajuste para móviles */
+    }
+}
+
+/* -------------- MODO ALTO CONTRASTE -------------- */
+body.high-contrast {
+    --cyber-dark: #000000;
+    --cyber-purple: #330066;
+    --cyber-pink: #ff00ff;
+    --cyber-teal: #00ffff;
+    --gothic-crimson: #ff0000;
+    --gothic-gold: #ffff00;
+    --menu-bg: rgba(0, 0, 0, 0.9);
+    --text-color: #ffffff;
+}
+
+body.high-contrast .menu-screen {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 2px #000000, 0 0 0 4px #ffffff;
+}
+
+body.high-contrast .menu-item {
+    background-color: #000000;
+    border-color: #ffffff;
+}
+
+body.high-contrast .menu-item:hover {
+    background-color: #330066;
+    border-color: #ff00ff;
+}
+
+/* -------------- EFECTOS PIXEL ART -------------- */
+/* Bordes pixelados sin utilizar imágenes */
+.pixelated-border {
+    position: relative;
+    border: none;
+    padding: 8px;
+}
+
+.pixelated-border::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(to right, var(--cyber-pink) 4px, transparent 4px),
+        linear-gradient(to bottom, var(--cyber-pink) 4px, transparent 4px),
+        linear-gradient(to left, var(--cyber-pink) 4px, transparent 4px),
+        linear-gradient(to top, var(--cyber-pink) 4px, transparent 4px);
+    background-position: 0 0, 0 0, 100% 0, 0 100%;
+    background-repeat: no-repeat;
+    z-index: -1;
+    box-shadow: 
+        0 0 8px var(--cyber-pink),
+        inset 0 0 8px var(--cyber-pink);
+}
+
+/* Efectos de interferencia VHS para elementos especiales */
+.glitch-effect {
+    position: relative;

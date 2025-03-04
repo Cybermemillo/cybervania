@@ -1,0 +1,22 @@
+{
+    "sourceFile": "css/reset.css",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1741033118408,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1741033298479,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,11 +1,25 @@\n-/* Reset CSS para asegurar que el estilo pixelado funcione correctamente */\r\n+/* Reset CSS básico para evitar estilos del navegador */\r\n * {\r\n     margin: 0;\r\n     padding: 0;\r\n     box-sizing: border-box;\r\n+    transition-duration: 0ms !important;\r\n }\r\n \r\n+/* Quitar decoración a listas */\r\n+ul, ol {\r\n+    list-style: none;\r\n+    padding: 0;\r\n+    margin: 0;\r\n+}\r\n+\r\n+/* Quitar subrayados de enlaces */\r\n+a {\r\n+    text-decoration: none;\r\n+    color: inherit;\r\n+}\r\n+\r\n /* Asegurarse que todo se renderice pixelado */\r\n html {\r\n     image-rendering: pixelated;\r\n     image-rendering: crisp-edges;\r\n@@ -17,18 +31,24 @@\n     padding: 0;\r\n     font-size: 16px;\r\n }\r\n \r\n-/* Eliminar bordes redondeados y sombras suavizadas */\r\n-input, button, select, textarea {\r\n-    border-radius: 0 !important;\r\n+/* Asegurar que botones e inputs tengan la fuente correcta */\r\n+button, input, select, textarea {\r\n+    font-family: inherit;\r\n+    font-size: inherit;\r\n+    color: inherit;\r\n+    border-radius: 0; /* Quitar bordes redondeados */\r\n     box-shadow: none !important;\r\n }\r\n \r\n-/* Quitar animaciones suaves para mantener el estilo pixelado */\r\n-* {\r\n-    transition-duration: 0ms !important;\r\n+/* Eliminar focus outline pero manteniendo accesibilidad */\r\n+:focus {\r\n+    outline: none;\r\n }\r\n+:focus-visible {\r\n+    outline: 2px solid #ffcd75;\r\n+}\r\n \r\n button:focus, input:focus, select:focus, textarea:focus {\r\n     outline-width: 4px;\r\n     outline-color: rgba(255, 205, 117, 0.8);\r\n"
+                }
+            ],
+            "date": 1741033118408,
+            "name": "Commit-0",
+            "content": "/* Reset CSS para asegurar que el estilo pixelado funcione correctamente */\r\n* {\r\n    margin: 0;\r\n    padding: 0;\r\n    box-sizing: border-box;\r\n}\r\n\r\n/* Asegurarse que todo se renderice pixelado */\r\nhtml {\r\n    image-rendering: pixelated;\r\n    image-rendering: crisp-edges;\r\n}\r\n\r\nbody {\r\n    overflow-x: hidden;\r\n    margin: 0;\r\n    padding: 0;\r\n    font-size: 16px;\r\n}\r\n\r\n/* Eliminar bordes redondeados y sombras suavizadas */\r\ninput, button, select, textarea {\r\n    border-radius: 0 !important;\r\n    box-shadow: none !important;\r\n}\r\n\r\n/* Quitar animaciones suaves para mantener el estilo pixelado */\r\n* {\r\n    transition-duration: 0ms !important;\r\n}\r\n\r\nbutton:focus, input:focus, select:focus, textarea:focus {\r\n    outline-width: 4px;\r\n    outline-color: rgba(255, 205, 117, 0.8);\r\n}\r\n"
+        }
+    ]
+}

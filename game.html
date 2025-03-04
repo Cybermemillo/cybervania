@@ -4,104 +4,1202 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cybervania - Juego</title>
+    
+    <!-- Precargar fuente -->
+    <link rel="preload" href="assets/fonts/Anemouth.ttf" as="font" type="font/ttf" crossorigin>
+    
     <style>
-        body {
+        @font-face {
+            font-family: 'Anemouth';
+            src: url('./assets/fonts/Anemouth.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        :root {
+            /* Colores góticos */
+            --gothic-black: #0a0205;
+            --gothic-dark: #1a0505;
+            --gothic-crimson: #430e0e;
+            --gothic-wine: #4d0f1c;
+            --gothic-purple: #35102a;
+            --gothic-deep-purple: #2d0245;
+            --gothic-gold: #c8aa6e;
+            --gothic-brass: #b08d57;
+            --gothic-bone: #e8dacb;
+            
+            /* Colores cyber */
+            --cyber-pink: #ff005b;
+            --cyber-blue: #00f6ff;
+            --cyber-purple: #9000ff;
+        }
+        
+        body, html {
             margin: 0;
             padding: 0;
-            background-color: #080818;
-            color: #e0f2ff;
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
+            background-color: var(--gothic-black);
+            color: var(--gothic-bone);
+            font-family: 'Anemouth', serif;
+            height: 100%;
+            overflow: hidden;
+            letter-spacing: 0.5px;
         }
         
         #game-container {
-            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: url('assets/images/backgrounds/game_bg.jpg') center/cover no-repeat;
+            position: relative;
         }
         
-        h1 {
-            font-size: 36px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(0, 195, 255, 0.5);
+        #game-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 30%, rgba(10, 2, 5, 0.8) 100%);
+            pointer-events: none;
+            z-index: 0;
         }
         
-        .player-info {
-            background: rgba(20, 40, 70, 0.6);
-            border: 1px solid rgba(41, 80, 120, 0.8);
-            border-radius: 5px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .btn {
+        /* Barra superior para stats */
+        #top-bar {
+            display: flex;
+            justify-content: space-between;
             padding: 10px 20px;
-            background: linear-gradient(to bottom, rgba(0, 150, 200, 0.8), rgba(0, 100, 150, 0.8));
-            color: #e0f2ff;
-            border: 1px solid rgba(41, 80, 120, 0.8);
-            border-radius: 3px;
-            cursor: pointer;
-            margin-top: 20px;
+            background-color: rgba(10, 2, 5, 0.85);
+            border-bottom: 2px solid var(--gothic-crimson);
+            z-index: 10;
+            height: 60px;
+        }
+        
+        #player-stats {
+            display: flex;
+            align-items: center;
+        }
+        
+        .stat-block {
+            margin-right: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-label {
+            color: var(--gothic-gold);
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+        
+        .stat-value {
+            display: flex;
+            align-items: center;
+        }
+        
+        .health-bar {
+            width: 150px;
+            height: 12px;
+            border: 1px solid var(--gothic-crimson);
+            position: relative;
+        }
+        
+        .health-fill {
+            height: 100%;
+            background-color: var(--gothic-crimson);
+            width: 100%;
+            transition: width 0.3s;
+        }
+        
+        .energy-bar {
+            width: 120px;
+            height: 8px;
+            border: 1px solid var(--cyber-blue);
+            position: relative;
+        }
+        
+        .energy-fill {
+            height: 100%;
+            background-color: var(--cyber-blue);
+            width: 100%;
+            transition: width 0.3s;
+        }
+        
+        /* Área principal del juego */
+        #game-area {
+            display: flex;
+            flex: 1;
+            z-index: 5;
+        }
+        
+        /* Área de combate */
+        #combat-zone {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            height: 100%;
+        }
+        
+        #battle-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10%;
+            position: relative;
+        }
+        
+        #player-character {
+            width: 180px;
+            height: 240px;
+            position: relative;
+        }
+        
+        #player-sprite {
+            width: 100%;
+            height: 100%;
+            background: url('assets/images/characters/player_idle.png') center/contain no-repeat;
+        }
+        
+        #player-effects {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        #enemy-character {
+            width: 220px;
+            height: 260px;
+        }
+        
+        #enemy-sprite {
+            width: 100%;
+            height: 100%;
+            background: url('assets/images/enemies/cyber_ghoul.png') center/contain no-repeat;
+        }
+        
+        #enemy-info {
+            position: absolute;
+            top: 50px;
+            right: 10%;
+            background-color: rgba(10, 2, 5, 0.7);
+            padding: 10px;
+            border: 1px solid var(--gothic-crimson);
+            text-align: left;
+        }
+        
+        #enemy-name {
+            color: var(--cyber-pink);
             font-size: 16px;
+            margin: 0 0 5px 0;
+        }
+        
+        #enemy-health-bar {
+            width: 180px;
+            height: 12px;
+            border: 1px solid var(--gothic-crimson);
+            margin-top: 5px;
+        }
+        
+        #enemy-health-fill {
+            height: 100%;
+            background-color: var(--gothic-crimson);
+            width: 100%;
+            transition: width 0.3s;
+        }
+        
+        /* Panel de acciones */
+        #action-panel {
+            background-color: rgba(10, 2, 5, 0.85);
+            padding: 15px;
+            border-top: 2px solid var(--gothic-wine);
+            display: flex;
+            flex-direction: column;
+            height: 180px;
+        }
+        
+        #message-log {
+            flex: 1;
+            color: var(--gothic-bone);
+            font-size: 14px;
+            margin-bottom: 10px;
+            overflow-y: auto;
+            background-color: rgba(26, 5, 20, 0.7);
+            padding: 10px;
+            border: 1px solid var(--gothic-purple);
+        }
+        
+        #combat-buttons {
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            border: 2px solid;
+            background-color: var(--gothic-dark);
+            color: var(--gothic-bone);
+            cursor: pointer;
+            font-family: 'Anemouth', serif;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            min-width: 120px;
+            text-align: center;
             transition: all 0.2s;
         }
         
-        .btn:hover {
-            background: linear-gradient(to bottom, rgba(0, 180, 230, 0.8), rgba(0, 120, 180, 0.8));
-            box-shadow: 0 0 8px rgba(0, 195, 255, 0.5);
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 10px rgba(255, 0, 91, 0.5);
+        }
+        
+        .attack-btn {
+            border-color: var(--gothic-crimson);
+        }
+        
+        .skill-btn {
+            border-color: var(--cyber-blue);
+        }
+        
+        .item-btn {
+            border-color: var(--gothic-gold);
+        }
+        
+        .defend-btn {
+            border-color: var(--gothic-purple);
+        }
+        
+        /* Side panel */
+        #side-panel {
+            flex: 1;
+            background-color: rgba(10, 2, 5, 0.85);
+            border-left: 2px solid var(--gothic-wine);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            max-width: 280px;
+        }
+        
+        #character-sheet {
+            border-bottom: 1px solid var(--gothic-wine);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .character-portrait {
+            background-color: rgba(26, 5, 20, 0.7);
+            width: 100px;
+            height: 120px;
+            margin: 0 auto 15px;
+            border: 1px solid var(--gothic-purple);
+        }
+        
+        .portrait-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: var(--gothic-gold);
+        }
+        
+        #character-name {
+            color: var(--gothic-gold);
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        
+        #character-level {
+            text-align: center;
+            font-size: 14px;
+            color: var(--cyber-blue);
+            margin-bottom: 15px;
+        }
+        
+        .char-stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .char-stat-name {
+            color: var(--gothic-brass);
+        }
+        
+        .section-title {
+            color: var(--gothic-gold);
+            font-size: 16px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--gothic-purple);
+            padding-bottom: 5px;
+        }
+        
+        #inventory {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .inventory-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .inventory-item {
+            padding: 5px 8px;
+            background-color: rgba(26, 5, 20, 0.7);
+            margin-bottom: 5px;
+            cursor: pointer;
+            border-left: 3px solid var(--gothic-brass);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .inventory-item:hover {
+            background-color: rgba(46, 15, 35, 0.7);
+            border-left-color: var(--gothic-gold);
+        }
+        
+        .menu-button {
+            margin-top: 15px;
+            padding: 8px;
+            background-color: var(--gothic-dark);
+            color: var(--gothic-bone);
+            border: 1px solid var(--gothic-wine);
+            cursor: pointer;
+            font-family: 'Anemouth', serif;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .menu-button:hover {
+            background-color: var(--gothic-wine);
+        }
+        
+        /* Animaciones */
+        @keyframes hit-effect {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        
+        @keyframes attack-forward {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(60px); }
+            100% { transform: translateX(0); }
+        }
+        
+        .hit {
+            animation: hit-effect 0.3s forwards;
+        }
+        
+        .attack {
+            animation: attack-forward 0.5s forwards;
+        }
+        
+        /* Modal diálogo */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: rgba(10, 2, 5, 0.95);
+            border: 2px solid var(--gothic-crimson);
+            padding: 20px;
+            max-width: 80%;
+            width: 600px;
+        }
+        
+        .modal-title {
+            color: var(--gothic-gold);
+            font-size: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .modal-text {
+            color: var(--gothic-bone);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .modal-button {
+            padding: 8px 16px;
+            margin: 0 10px;
+            border: 1px solid var(--gothic-gold);
+            background-color: var(--gothic-dark);
+            color: var(--gothic-bone);
+            cursor: pointer;
+        }
+        
+        .modal-button:hover {
+            background-color: var(--gothic-wine);
         }
     </style>
 </head>
 <body>
     <div id="game-container">
-        <h1>¡Partida Iniciada!</h1>
-        
-        <div class="player-info" id="player-info">
-            <!-- Esta información se completará con JS -->
+        <!-- Barra superior con información del jugador -->
+        <div id="top-bar">
+            <div id="player-stats">
+                <div class="stat-block">
+                    <div class="stat-label">Salud</div>
+                    <div class="stat-value">
+                        <div class="health-bar">
+                            <div class="health-fill" id="player-health-fill"></div>
+                        </div>
+                        <span id="health-text" style="margin-left: 5px;">100/100</span>
+                    </div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-label">Energía</div>
+                    <div class="stat-value">
+                        <div class="energy-bar">
+                            <div class="energy-fill" id="player-energy-fill"></div>
+                        </div>
+                        <span id="energy-text" style="margin-left: 5px;">50/50</span>
+                    </div>
+                </div>
+                <div class="stat-block">
+                    <div class="stat-label">Créditos</div>
+                    <div class="stat-value">
+                        <span id="credits-text" style="color: var(--gothic-gold);">500</span>
+                    </div>
+                </div>
+            </div>
+            <div id="location-info" style="display: flex; align-items: center;">
+                <div style="text-align: right;">
+                    <div style="color: var(--cyber-pink);">Ruinas Tecnológicas</div>
+                    <div style="font-size: 12px;">Nivel de amenaza: Medio</div>
+                </div>
+            </div>
         </div>
         
-        <div>
-            <p>La implementación real del juego iría aquí.</p>
-            <button class="btn" onclick="window.location.href='index.html'">Volver al Menú</button>
+        <!-- Área principal del juego -->
+        <div id="game-area">
+            <!-- Zona de combate -->
+            <div id="combat-zone">
+                <div id="battle-area">
+                    <!-- Jugador -->
+                    <div id="player-character">
+                        <div id="player-sprite"></div>
+                        <div id="player-effects"></div>
+                    </div>
+                    
+                    <!-- Enemigo -->
+                    <div id="enemy-character">
+                        <div id="enemy-sprite"></div>
+                        <div id="enemy-effects"></div>
+                    </div>
+                    
+                    <!-- Información del enemigo -->
+                    <div id="enemy-info">
+                        <h3 id="enemy-name">Espectro Cibernético</h3>
+                        <div id="enemy-health-bar">
+                            <div id="enemy-health-fill"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Panel de acciones -->
+                <div id="action-panel">
+                    <div id="message-log">
+                        <p>Has entrado en las Ruinas Tecnológicas...</p>
+                        <p>¡Un Espectro Cibernético aparece entre las sombras!</p>
+                    </div>
+                    <div id="combat-buttons">
+                        <button class="action-btn attack-btn" onclick="playerAttack()">Atacar</button>
+                        <button class="action-btn skill-btn" onclick="useSkill()">Habilidad</button>
+                        <button class="action-btn item-btn" onclick="useItem()">Objeto</button>
+                        <button class="action-btn defend-btn" onclick="defend()">Defender</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Panel lateral -->
+            <div id="side-panel">
+                <!-- Ficha de personaje -->
+                <div id="character-sheet">
+                    <div class="character-portrait">
+                        <div class="portrait-placeholder">RETRATO</div>
+                    </div>
+                    <h3 id="character-name">Hacker</h3>
+                    <div id="character-level">Nivel 1</div>
+                    
+                    <div class="char-stat-row">
+                        <span class="char-stat-name">Ataque:</span>
+                        <span id="stat-attack">10</span>
+                    </div>
+                    <div class="char-stat-row">
+                        <span class="char-stat-name">Defensa:</span>
+                        <span id="stat-defense">5</span>
+                    </div>
+                    <div class="char-stat-row">
+                        <span class="char-stat-name">Velocidad:</span>
+                        <span id="stat-speed">7</span>
+                    </div>
+                    <div class="char-stat-row">
+                        <span class="char-stat-name">EXP:</span>
+                        <span id="stat-exp">0/100</span>
+                    </div>
+                </div>
+                
+                <!-- Inventario -->
+                <div id="inventory">
+                    <h4 class="section-title">Inventario</h4>
+                    <ul class="inventory-list">
+                        <li class="inventory-item" onclick="selectItem(1)">Poción de salud</li>
+                        <li class="inventory-item" onclick="selectItem(2)">Granada EMP</li>
+                        <li class="inventory-item" onclick="selectItem(3)">Estimulante neural</li>
+                    </ul>
+                </div>
+                
+                <button class="menu-button" onclick="openMenu()">Menú Principal</button>
+            </div>
         </div>
     </div>
-
+    
+    <!-- Modal para diálogos -->
+    <div class="modal" id="dialog-modal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="dialog-title">Título</h3>
+            <div class="modal-text" id="dialog-text">Texto del diálogo...</div>
+            <div class="modal-buttons">
+                <button class="modal-button" id="dialog-confirm" onclick="closeDialog()">Aceptar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para resultados de combate -->
+    <div class="modal" id="combat-result-modal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="result-title">¡Victoria!</h3>
+            <div class="modal-text" id="result-text">
+                Has derrotado al Espectro Cibernético.
+                <div style="margin-top: 15px;">
+                    <p>Recompensas:</p>
+                    <ul style="list-style-type: none; padding-left: 20px;">
+                        <li>+ 25 EXP</li>
+                        <li>+ 75 Créditos</li>
+                        <li>+ 1 Fragmento de datos</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-button" onclick="continueBattle()">Continuar</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
+        // Estado del juego
+        const gameState = {
+            player: {
+                name: "Hacker",
+                level: 1,
+                health: 100,
+                maxHealth: 100,
+                energy: 50,
+                maxEnergy: 50,
+                attack: 10,
+                defense: 5,
+                speed: 7,
+                exp: 0,
+                nextLevelExp: 100,
+                credits: 500,
+                specialization: "red", // red, blue, purple
+                defending: false,
+                inventory: [
+                    { id: 1, name: "Poción de salud", type: "heal", value: 30, description: "Restaura 30 puntos de salud" },
+                    { id: 2, name: "Granada EMP", type: "damage", value: 25, description: "Causa 25 puntos de daño al enemigo" },
+                    { id: 3, name: "Estimulante neural", type: "energy", value: 20, description: "Restaura 20 puntos de energía" }
+                ]
+            },
+            enemy: {
+                name: "Espectro Cibernético",
+                health: 80,
+                maxHealth: 80,
+                attack: 8,
+                defense: 3,
+                isStunned: false,
+                exp: 25,
+                credits: 75
+            },
+            turn: "player", // player, enemy, none
+            combatActive: true
+        };
+        
+        // Cargar datos del jugador si existen
         document.addEventListener('DOMContentLoaded', function() {
-            // Obtener los datos del jugador desde localStorage
-            const playerData = localStorage.getItem('current_player');
-            
-            if (playerData) {
-                try {
-                    const player = JSON.parse(playerData);
-                    
-                    // Mostrar datos básicos del jugador
-                    document.getElementById('player-info').innerHTML = `
-                        <h2>Hacker: ${player.name}</h2>
-                        <p><strong>Especialización:</strong> ${getSpecName(player.specialization)}</p>
-                        <p><strong>Salud:</strong> ${player.health}/${player.maxHealth}</p>
-                        <p><strong>Créditos:</strong> ${player.credits}</p>
-                    `;
-                } catch (e) {
-                    console.error('Error al cargar datos del jugador:', e);
-                    document.getElementById('player-info').innerHTML = '<p>Error al cargar datos del jugador</p>';
-                }
-            } else {
-                document.getElementById('player-info').innerHTML = '<p>No hay datos de jugador. Inicia una nueva partida.</p>';
-            }
-            
-            // Función para obtener nombre legible de especialización
-            function getSpecName(specId) {
-                switch(specId) {
-                    case 'red': return 'Ofensivo';
-                    case 'blue': return 'Defensivo';
-                    case 'purple': return 'Equilibrado';
-                    default: return 'Desconocido';
-                }
-            }
+            loadPlayerData();
+            updateUI();
         });
+        
+        function loadPlayerData() {
+            try {
+                const savedData = localStorage.getItem('current_player');
+                if (savedData) {
+                    const playerData = JSON.parse(savedData);
+                    
+                    // Actualizar datos básicos
+                    gameState.player.name = playerData.name || gameState.player.name;
+                    gameState.player.level = playerData.level || gameState.player.level;
+                    gameState.player.maxHealth = playerData.maxHealth || gameState.player.maxHealth;
+                    gameState.player.health = playerData.health || gameState.player.maxHealth;
+                    gameState.player.maxEnergy = playerData.maxEnergy || gameState.player.maxEnergy;
+                    gameState.player.energy = playerData.maxEnergy || gameState.player.maxEnergy;
+                    gameState.player.attack = playerData.baseAttack || gameState.player.attack;
+                    gameState.player.defense = playerData.baseDefense || gameState.player.defense;
+                    gameState.player.speed = playerData.baseSpeed || gameState.player.speed;
+                    gameState.player.credits = playerData.credits || gameState.player.credits;
+                    gameState.player.specialization = playerData.specialization || gameState.player.specialization;
+                    
+                    // Ajustar dificultad del enemigo según nivel del jugador
+                    if (gameState.player.level > 1) {
+                        const levelFactor = 1 + (gameState.player.level - 1) * 0.2;
+                        gameState.enemy.maxHealth = Math.floor(gameState.enemy.maxHealth * levelFactor);
+                        gameState.enemy.health = gameState.enemy.maxHealth;
+                        gameState.enemy.attack = Math.floor(gameState.enemy.attack * levelFactor);
+                        gameState.enemy.defense = Math.floor(gameState.enemy.defense * levelFactor);
+                    }
+                }
+            } catch (e) {
+                console.error('Error cargando datos del jugador:', e);
+            }
+        }
+        
+        function updateUI() {
+            // Actualizar estadísticas del jugador
+            document.getElementById('player-health-fill').style.width = (gameState.player.health / gameState.player.maxHealth * 100) + '%';
+            document.getElementById('player-energy-fill').style.width = (gameState.player.energy / gameState.player.maxEnergy * 100) + '%';
+            document.getElementById('health-text').textContent = `${gameState.player.health}/${gameState.player.maxHealth}`;
+            document.getElementById('energy-text').textContent = `${gameState.player.energy}/${gameState.player.maxEnergy}`;
+            document.getElementById('credits-text').textContent = gameState.player.credits;
+            
+            // Actualizar ficha de personaje
+            document.getElementById('character-name').textContent = gameState.player.name;
+            document.getElementById('character-level').textContent = `Nivel ${gameState.player.level}`;
+            document.getElementById('stat-attack').textContent = gameState.player.attack;
+            document.getElementById('stat-defense').textContent = gameState.player.defense;
+            document.getElementById('stat-speed').textContent = gameState.player.speed;
+            document.getElementById('stat-exp').textContent = `${gameState.player.exp}/${gameState.player.nextLevelExp}`;
+            
+            // Actualizar datos del enemigo
+            document.getElementById('enemy-name').textContent = gameState.enemy.name;
+            document.getElementById('enemy-health-fill').style.width = (gameState.enemy.health / gameState.enemy.maxHealth * 100) + '%';
+        }
+        
+        function addMessage(text) {
+            const messageLog = document.getElementById('message-log');
+            const message = document.createElement('p');
+            message.textContent = text;
+            messageLog.appendChild(message);
+            messageLog.scrollTop = messageLog.scrollHeight;
+        }
+        
+        function showDialog(title, text) {
+            document.getElementById('dialog-title').textContent = title;
+            document.getElementById('dialog-text').textContent = text;
+            document.getElementById('dialog-modal').style.display = 'flex';
+        }
+        
+        function closeDialog() {
+            document.getElementById('dialog-modal').style.display = 'none';
+        }
+        
+        function openMenu() {
+            if (confirm('¿Volver al menú principal? El progreso no guardado se perderá.')) {
+                window.location.href = 'index.html';
+            }
+        }
+        
+        function playerAttack() {
+            if (gameState.turn !== "player" || !gameState.combatActive) return;
+            
+            // Animar ataque
+            document.getElementById('player-sprite').classList.add('attack');
+            setTimeout(() => document.getElementById('player-sprite').classList.remove('attack'), 500);
+            
+            // Calcular daño
+            const damage = Math.max(1, gameState.player.attack - gameState.enemy.defense);
+            gameState.enemy.health = Math.max(0, gameState.enemy.health - damage);
+            
+            // Mostrar mensaje
+            addMessage(`Has atacado al ${gameState.enemy.name} causando ${damage} puntos de daño.`);
+            
+            // Animar daño al enemigo
+            setTimeout(() => {
+                document.getElementById('enemy-sprite').classList.add('hit');
+                setTimeout(() => document.getElementById('enemy-sprite').classList.remove('hit'), 300);
+            }, 500);
+            
+            // Actualizar UI
+            setTimeout(() => {
+                updateUI();
+                
+                // Verificar si el enemigo ha sido derrotado
+                if (gameState.enemy.health <= 0) {
+                    endCombat(true);
+                    return;
+                }
+                
+                // Turno del enemigo
+                gameState.turn = "enemy";
+                setTimeout(enemyTurn, 1000);
+            }, 800);
+        }
+        
+        function useSkill() {
+            if (gameState.turn !== "player" || !gameState.combatActive) return;
+            
+            // Verificar energía
+            if (gameState.player.energy < 15) {
+                addMessage("No tienes suficiente energía para usar una habilidad.");
+                return;
+            }
+            
+            // Usar energía
+            gameState.player.energy -= 15;
+            
+            // Efecto según especialización
+            let skillName, damage;
+            switch (gameState.player.specialization) {
+                case 'red': // Ofensivo
+                    skillName = "Golpe Crítico";
+                    damage = Math.floor(gameState.player.attack * 1.5);
+                    gameState.enemy.health = Math.max(0, gameState.enemy.health - damage);
+                    addMessage(`¡Usas ${skillName}! Causas ${damage} puntos de daño al ${gameState.enemy.name}.`);
+                    break;
+                    
+                case 'blue': // Defensivo
+                    skillName = "Escudo Cibernético";
+                    gameState.player.defense += 3;
+                    gameState.player.defending = true;
+                    addMessage(`¡Usas ${skillName}! Tu defensa aumenta temporalmente en 3 puntos.`);
+                    break;
+                    
+                case 'purple': // Equilibrado
+                    skillName = "Interferencia Neural";
+                    damage = Math.floor(gameState.player.attack * 0.8);
+                    gameState.enemy.health = Math.max(0, gameState.enemy.health - damage);
+                    gameState.enemy.isStunned = true;
+                    addMessage
+<script>
+    // Continuación del script anterior
+    
+    function useSkill() {
+        // ...existing code...
+        
+        switch (gameState.player.specialization) {
+            // ...existing code...
+                
+            case 'purple': // Equilibrado
+                skillName = "Interferencia Neural";
+                damage = Math.floor(gameState.player.attack * 0.8);
+                gameState.enemy.health = Math.max(0, gameState.enemy.health - damage);
+                gameState.enemy.isStunned = true;
+                addMessage(`¡Usas ${skillName}! Causas ${damage} puntos de daño al ${gameState.enemy.name} y lo aturdes.`);
+                break;
+                
+            default:
+                skillName = "Ataque Rápido";
+                damage = gameState.player.attack;
+                gameState.enemy.health = Math.max(0, gameState.enemy.health - damage);
+                addMessage(`¡Usas ${skillName}! Causas ${damage} puntos de daño al ${gameState.enemy.name}.`);
+                break;
+        }
+        
+        // Animar al jugador
+        document.getElementById('player-sprite').classList.add('attack');
+        setTimeout(() => document.getElementById('player-sprite').classList.remove('attack'), 500);
+        
+        // Animar daño al enemigo
+        setTimeout(() => {
+            document.getElementById('enemy-sprite').classList.add('hit');
+            setTimeout(() => document.getElementById('enemy-sprite').classList.remove('hit'), 300);
+        }, 500);
+        
+        // Actualizar UI
+        setTimeout(() => {
+            updateUI();
+            
+            // Verificar si el enemigo ha sido derrotado
+            if (gameState.enemy.health <= 0) {
+                endCombat(true);
+                return;
+            }
+            
+            // Turno del enemigo
+            gameState.turn = "enemy";
+            setTimeout(enemyTurn, 1000);
+        }, 800);
+    }
+    
+    function useItem() {
+        if (gameState.turn !== "player" || !gameState.combatActive) return;
+        
+        // Mostrar opciones de inventario en un diálogo
+        const dialog = document.getElementById('dialog-modal');
+        const dialogTitle = document.getElementById('dialog-title');
+        const dialogText = document.getElementById('dialog-text');
+        const dialogConfirm = document.getElementById('dialog-confirm');
+        
+        // Configurar el diálogo
+        dialogTitle.textContent = "Inventario";
+        
+        // Crear elementos para cada ítem
+        let html = "<div class='inventory-dialog'>";
+        gameState.player.inventory.forEach(item => {
+            html += `<div class='inventory-option' onclick='selectItem(${item.id})'>
+                <div class='item-name'>${item.name}</div>
+                <div class='item-desc'>${item.description}</div>
+            </div>`;
+        });
+        html += "</div>";
+        
+        dialogText.innerHTML = html;
+        dialogConfirm.textContent = "Cancelar";
+        
+        // Mostrar diálogo
+        dialog.style.display = 'flex';
+    }
+    
+    function selectItem(itemId) {
+        // Cerrar diálogo
+        closeDialog();
+        
+        // Buscar ítem en inventario
+        const item = gameState.player.inventory.find(i => i.id === itemId);
+        if (!item) return;
+        
+        let effect = 0;
+        
+        // Aplicar efecto según tipo de ítem
+        switch(item.type) {
+            case 'heal':
+                effect = Math.min(item.value, gameState.player.maxHealth - gameState.player.health);
+                gameState.player.health += effect;
+                addMessage(`Has usado ${item.name}. Recuperas ${effect} puntos de salud.`);
+                break;
+                
+            case 'energy':
+                effect = Math.min(item.value, gameState.player.maxEnergy - gameState.player.energy);
+                gameState.player.energy += effect;
+                addMessage(`Has usado ${item.name}. Recuperas ${effect} puntos de energía.`);
+                break;
+                
+            case 'damage':
+                effect = Math.max(1, item.value - gameState.enemy.defense);
+                gameState.enemy.health = Math.max(0, gameState.enemy.health - effect);
+                addMessage(`Has usado ${item.name} contra el enemigo. Causas ${effect} puntos de daño.`);
+                
+                // Animar daño al enemigo
+                document.getElementById('enemy-sprite').classList.add('hit');
+                setTimeout(() => document.getElementById('enemy-sprite').classList.remove('hit'), 300);
+                break;
+        }
+        
+        // Eliminar el ítem usado
+        const itemIndex = gameState.player.inventory.findIndex(i => i.id === itemId);
+        if (itemIndex !== -1) {
+            gameState.player.inventory.splice(itemIndex, 1);
+        }
+        
+        // Actualizar UI
+        updateUI();
+        
+        // Verificar si el enemigo ha sido derrotado
+        if (gameState.enemy.health <= 0) {
+            endCombat(true);
+            return;
+        }
+        
+        // Pasar turno al enemigo
+        gameState.turn = "enemy";
+        setTimeout(enemyTurn, 1000);
+    }
+    
+    function defend() {
+        if (gameState.turn !== "player" || !gameState.combatActive) return;
+        
+        // Aumentar defensa temporalmente
+        const defenseBonus = Math.floor(gameState.player.defense * 0.5);
+        gameState.player.defense += defenseBonus;
+        gameState.player.defending = true;
+        
+        addMessage(`Te has puesto en posición defensiva. Tu defensa aumenta ${defenseBonus} puntos.`);
+        
+        // Turno del enemigo
+        gameState.turn = "enemy";
+        setTimeout(enemyTurn, 1000);
+    }
+    
+    function enemyTurn() {
+        if (!gameState.combatActive) return;
+        
+        // Verificar si el enemigo está aturdido
+        if (gameState.enemy.isStunned) {
+            addMessage(`${gameState.enemy.name} está aturdido y no puede atacar este turno.`);
+            gameState.enemy.isStunned = false; // Recuperarse del aturdimiento
+            gameState.turn = "player";
+            return;
+        }
+        
+        // El enemigo ataca
+        const damage = Math.max(1, gameState.enemy.attack - gameState.player.defense);
+        gameState.player.health = Math.max(0, gameState.player.health - damage);
+        
+        // Mensaje
+        addMessage(`${gameState.enemy.name} te ataca y causa ${damage} puntos de daño.`);
+        
+        // Animar daño al jugador
+        document.getElementById('player-sprite').classList.add('hit');
+        setTimeout(() => document.getElementById('player-sprite').classList.remove('hit'), 300);
+        
+        // Si el jugador estaba defendiendo, quitar el bono de defensa
+        if (gameState.player.defending) {
+            const defenseBonus = Math.floor(gameState.player.defense * 0.5 / 1.5);
+            gameState.player.defense -= defenseBonus;
+            gameState.player.defending = false;
+        }
+        
+        // Actualizar UI
+        updateUI();
+        
+        // Verificar si el jugador ha sido derrotado
+        if (gameState.player.health <= 0) {
+            endCombat(false);
+            return;
+        }
+        
+        // Devolver turno al jugador
+        gameState.turn = "player";
+    }
+    
+    function endCombat(victory) {
+        gameState.combatActive = false;
+        
+        const resultModal = document.getElementById('combat-result-modal');
+        const resultTitle = document.getElementById('result-title');
+        const resultText = document.getElementById('result-text');
+        
+        if (victory) {
+            // Victoria
+            resultTitle.textContent = '¡Victoria!';
+            
+            // Calcular recompensas
+            const expGained = gameState.enemy.exp;
+            const creditsGained = gameState.enemy.credits;
+            
+            // Actualizar estadísticas del jugador
+            gameState.player.exp += expGained;
+            gameState.player.credits += creditsGained;
+            
+            // Verificar subida de nivel
+            let levelUpText = '';
+            if (gameState.player.exp >= gameState.player.nextLevelExp) {
+                const oldLevel = gameState.player.level;
+                gameState.player.level++;
+                gameState.player.exp -= gameState.player.nextLevelExp;
+                gameState.player.nextLevelExp = 100 * Math.pow(1.5, gameState.player.level - 1);
+                gameState.player.attack += 2;
+                gameState.player.defense += 1;
+                gameState.player.maxHealth += 10;
+                gameState.player.health = gameState.player.maxHealth; // Recuperación total
+                
+                levelUpText = `<p style="color: var(--gothic-gold); margin-top: 10px;">¡Has subido al nivel ${gameState.player.level}!</p>
+                <p>Ataque +2</p>
+                <p>Defensa +1</p>
+                <p>Salud Máxima +10</p>`;
+            }
+            
+            // Item aleatorio como recompensa
+            const randomItems = [
+                { name: "Poción de salud", type: "heal", value: 30, description: "Restaura 30 puntos de salud" },
+                { name: "Granada EMP", type: "damage", value: 25, description: "Causa 25 puntos de daño al enemigo" },
+                { name: "Estimulante neural", type: "energy", value: 20, description: "Restaura 20 puntos de energía" },
+                { name: "Fragmento de datos", type: "quest", value: 1, description: "Componente para mejoras" }
+            ];
+            
+            const randomItem = randomItems[Math.floor(Math.random() * randomItems.length)];
+            const newItemId = Date.now(); // ID único basado en timestamp
+            randomItem.id = newItemId;
+            gameState.player.inventory.push(randomItem);
+            
+            // Mostrar texto de resultado
+            resultText.innerHTML = `
+                Has derrotado a ${gameState.enemy.name}.
+                <div style="margin-top: 15px;">
+                    <p>Recompensas:</p>
+                    <ul style="list-style-type: none; padding-left: 20px;">
+                        <li>+ ${expGained} EXP</li>
+                        <li>+ ${creditsGained} Créditos</li>
+                        <li>+ ${randomItem.name}</li>
+                    </ul>
+                    ${levelUpText}
+                </div>
+            `;
+            
+        } else {
+            // Derrota
+            resultTitle.textContent = '¡Derrota!';
+            resultText.innerHTML = `
+                Has sido derrotado por ${gameState.enemy.name}.
+                <div style="margin-top: 15px;">
+                    <p>Pierdes ${Math.floor(gameState.player.credits * 0.1)} créditos en el combate.</p>
+                </div>
+            `;
+            
+            // Penalización por derrota
+            gameState.player.credits = Math.floor(gameState.player.credits * 0.9);
+            gameState.player.health = Math.floor(gameState.player.maxHealth * 0.3); // Recuperación parcial
+        }
+        
+        // Mostrar modal
+        resultModal.style.display = 'flex';
+        
+        // Guardar progreso
+        saveGame();
+    }
+    
+    function continueBattle() {
+        // Cerrar modal
+        document.getElementById('combat-result-modal').style.display = 'none';
+        
+        // Si fue victoria, generar nuevo enemigo
+        if (gameState.player.health > 0) {
+            generateNewEnemy();
+            gameState.combatActive = true;
+            gameState.turn = "player";
+            addMessage("Un nuevo enemigo aparece.");
+            updateUI();
+        } else {
+            // Si fue derrota, volver al menú
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+    }
+    
+    function generateNewEnemy() {
+        // Lista de posibles enemigos
+        const enemies = [
+            {
+                name: "Espectro Cibernético",
+                health: 80,
+                attack: 8,
+                defense: 3,
+                exp: 25,
+                credits: 75
+            },
+            {
+                name: "Dron Centinela",
+                health: 60,
+                attack: 12,
+                defense: 2,
+                exp: 30,
+                credits: 85
+            },
+            {
+                name: "Cazador Digital",
+                health: 100,
+                attack: 7,
+                defense: 5,
+                exp: 35,
+                credits: 90
+            }
+        ];
+        
+        // Seleccionar uno aleatorio
+        const enemyTemplate = enemies[Math.floor(Math.random() * enemies.length)];
+        
+        // Ajustar según nivel del jugador
+        const levelFactor = 1 + (gameState.player.level - 1) * 0.2;
+        
+        // Asignar al estado del juego
+        gameState.enemy = {
+            name: enemyTemplate.name,
+            maxHealth: Math.floor(enemyTemplate.health * levelFactor),
+            health: Math.floor(enemyTemplate.health * levelFactor),
+            attack: Math.floor(enemyTemplate.attack * levelFactor),
+            defense: Math.floor(enemyTemplate.defense * levelFactor),
+            isStunned: false,
+            exp: Math.floor(enemyTemplate.exp * levelFactor),
+            credits: Math.floor(enemyTemplate.credits * levelFactor)
+        };
+        
+        // Actualizar UI para mostrar nuevo enemigo
+        document.getElementById('enemy-name').textContent = gameState.enemy.name;
+        document.getElementById('enemy-health-fill').style.width = '100%';
+        
+        // Cambiar sprite según el enemigo
+        const enemySprite = document.getElementById('enemy-sprite');
+        switch (gameState.enemy.name) {
+            case "Dron Centinela":
+                enemySprite.style.backgroundImage = "url('assets/images/enemies/drone_sentinel.png')";
+                break;
+            case "Cazador Digital":
+                enemySprite.style.backgroundImage = "url('assets/images/enemies/digital_hunter.png')";
+                break;
+            default:
+                enemySprite.style.backgroundImage = "url('assets/images/enemies/cyber_ghoul.png')";
+        }
+    }
+    
+    function saveGame() {
+        try {
+            // Crear objeto de guardado
+            const saveData = {
+                name: gameState.player.name,
+                level: gameState.player.level,
+                exp: gameState.player.exp,
+                maxHealth: gameState.player.maxHealth,
+                health: gameState.player.health,
+                maxEnergy: gameState.player.maxEnergy,
+                energy: gameState.player.energy,
+                baseAttack: gameState.player.attack,
+                baseDefense: gameState.player.defense,
+                baseSpeed: gameState.player.speed,
+                credits: gameState.player.credits,
+                inventory: gameState.player.inventory,
+                specialization: gameState.player.specialization,
+                lastSave: new Date().toISOString(),
+                location: 'ruinas_tecnologicas'
+            };
+            
+            // Guardar en localStorage
+            localStorage.setItem('current_player', JSON.stringify(saveData));
+        } catch (e) {
+            console.error('Error guardando datos del jugador:', e);
+        }
+    }
+            }
+        }
     </script>
 </body>
 </html>

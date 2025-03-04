@@ -1,0 +1,18 @@
+{
+    "sourceFile": "font-preload.html",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1741036509909,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1741036509909,
+            "name": "Commit-0",
+            "content": "<!DOCTYPE html>\r\n<html lang=\"es\">\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n    <title>Cargando fuentes...</title>\r\n    <style>\r\n        @font-face {\r\n            font-family: 'Anemouth';\r\n            src: url('./assets/fonts/Anemouth.ttf') format('truetype');\r\n            font-weight: normal;\r\n            font-style: normal;\r\n            font-display: swap;\r\n        }\r\n        \r\n        body {\r\n            background-color: #0a0205;\r\n            color: #e8dacb;\r\n            font-family: 'Anemouth', serif;\r\n            display: flex;\r\n            justify-content: center;\r\n            align-items: center;\r\n            height: 100vh;\r\n            margin: 0;\r\n            flex-direction: column;\r\n        }\r\n        \r\n        .loading-text {\r\n            font-size: 32px;\r\n            margin-bottom: 20px;\r\n            letter-spacing: 2px;\r\n        }\r\n        \r\n        .font-sample {\r\n            font-size: 20px;\r\n            opacity: 0.7;\r\n            margin-top: 20px;\r\n            letter-spacing: 1px;\r\n        }\r\n        \r\n        .loading-bar {\r\n            width: 300px;\r\n            height: 10px;\r\n            border: 2px solid #4d0f1c;\r\n            position: relative;\r\n            overflow: hidden;\r\n        }\r\n        \r\n        .loading-progress {\r\n            position: absolute;\r\n            top: 0;\r\n            left: 0;\r\n            height: 100%;\r\n            width: 0%;\r\n            background-color: #800e0e;\r\n            animation: load 2s forwards;\r\n        }\r\n        \r\n        @keyframes load {\r\n            0% { width: 0%; }\r\n            100% { width: 100%; }\r\n        }\r\n    </style>\r\n    <script>\r\n        document.addEventListener('DOMContentLoaded', function() {\r\n            // Esperar a que la fuente se cargue correctamente\r\n            document.fonts.ready.then(() => {\r\n                // Comprobar si la fuente se ha cargado correctamente\r\n                if (document.fonts.check('1em Anemouth')) {\r\n                    console.log('Fuente Anemouth cargada correctamente');\r\n                } else {\r\n                    console.warn('La fuente Anemouth no se cargó, se usará fuente fallback');\r\n                }\r\n                \r\n                // Redirigir al index después de un breve retraso\r\n                setTimeout(() => {\r\n                    window.location.href = 'index.html';\r\n                }, 2500); // 2.5 segundos para ver la animación de carga\r\n            });\r\n        });\r\n    </script>\r\n</head>\r\n<body>\r\n    <div class=\"loading-text\">CYBERVANIA</div>\r\n    <div class=\"loading-bar\">\r\n        <div class=\"loading-progress\"></div>\r\n    </div>\r\n    <div class=\"font-sample\">Cargando fuente Anemouth...</div>\r\n</body>\r\n</html>\r\n"
+        }
+    ]
+}

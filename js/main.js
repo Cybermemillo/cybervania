@@ -1,13 +1,14 @@
 import { MainMenu } from './ui/MainMenu.js';
 import { GothicEffects } from './ui/GothicEffects.js';
 import { MenuEffects } from './ui/MenuEffects.js';
+import { RetroEffects } from './ui/RetroEffects.js';
 import { getAudioManager } from './audio/AudioManager.js';
 import { Player } from './entities/Player.js';
 import { getLocalization } from './i18n/Localization.js';
 
 // Inicializar sistemas cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🦇 Cybervania - Inicializando menú principal...');
+    console.log('🎮 Cybervania - Inicializando menú principal con estilo retro...');
     
     // Cargar opciones guardadas para determinar el idioma inicial
     let savedLanguage = 'es'; // Idioma por defecto
@@ -60,18 +61,33 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inicializar efectos visuales
     const menuEffects = new MenuEffects('menu-container');
     const gothicEffects = new GothicEffects('menu-container');
+    const retroEffects = new RetroEffects('menu-container');
     
     // Añadir viñeta oscura
     gothicEffects.addDarkVignette();
     
-    // Aplicar efectos góticos en títulos
-    gothicEffects.applyBloodyText('.menu-screen h3');
+    // Crear un efecto aleatorio cada 30 segundos
+    setInterval(() => {
+        if (Math.random() > 0.3) { // 30% de probabilidad
+            const effects = [
+                () => gothicEffects.triggerLightning(),
+                () => gothicEffects.flickerLights(),
+                () => gothicEffects.pulseBackground(),
+                () => menuEffects.simulateSignalInterference()
+            ];
+            
+            // Seleccionar efecto aleatorio
+            const randomEffect = effects[Math.floor(Math.random() * effects.length)];
+            randomEffect();
+        }
+    }, 30000);
     
     // Agregar gestor global para la configuración
     window.cybervaniaSettings = {
         mainMenu,
         menuEffects,
         gothicEffects,
+        retroEffects,
         audioManager,
         localization,
         
@@ -114,23 +130,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Aplicar opciones iniciales
     window.cybervaniaSettings.applySettings(mainMenu.gameOptions);
-    
-    // Crear un efecto aleatorio cada 30 segundos
-    setInterval(() => {
-        if (Math.random() > 0.3) { // 30% de probabilidad
-            const effects = [
-                () => gothicEffects.triggerLightning(),
-                () => gothicEffects.flickerLights(),
-                () => gothicEffects.pulseBackground(),
-                () => menuEffects.simulateSignalInterference(),
-                () => gothicEffects.addBloodSplatter()
-            ];
-            
-            // Seleccionar efecto aleatorio
-            const randomEffect = effects[Math.floor(Math.random() * effects.length)];
-            randomEffect();
-        }
-    }, 30000);
     
     // Añadir listener para tecla Escape para volver al menú principal
     document.addEventListener('keydown', (e) => {

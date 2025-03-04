@@ -1,8 +1,12 @@
-# Archivos de imagen necesarios
+# Imágenes necesarias para el tema de 16 bits
 
-Para que el menú funcione correctamente, asegúrate de que los siguientes archivos estén en sus directorios correspondientes:
+Para que el menú funcione correctamente con el estilo SNES de 16 bits, asegúrate de tener los siguientes archivos:
 
-1. `backgrounds/menu_bg.jpg` - Fondo principal del menú (un castillo con estilo gótico-cyberpunk)
-2. `favicon.png` - Ícono para la pestaña del navegador (idealmente un símbolo de Cybervania)
+1. `backgrounds/pixel_castle_bg.png` - Fondo pixelado del castillo (512x512px idealmente)
+2. `backgrounds/pixel_pattern.png` - Patrón de fondo para elementos (32x32px)
+3. `favicon-pixel.png` - Ícono pixelado para la pestaña del navegador (32x32px)
 
-Si no tienes estas imágenes, puedes usar temporalmente cualquier imagen oscura de fondo para el castillo y un favicon básico.
+Recomendaciones:
+- Las imágenes deben estar en formato PNG con transparencia donde sea necesario
+- Utiliza una paleta limitada de 16-32 colores para mantener la estética SNES
+- Para crear gráficos pixelados puedes usar herramientas como Aseprite, Piskel o GIMP

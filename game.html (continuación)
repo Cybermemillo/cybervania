@@ -1,0 +1,384 @@
+<script>
+    // Continuación del script anterior
+    
+    function useSkill() {
+        // ...existing code...
+        
+        switch (gameState.player.specialization) {
+            // ...existing code...
+                
+            case 'purple': // Equilibrado
+                skillName = "Interferencia Neural";
+                damage = Math.floor(gameState.player.attack * 0.8);
+                gameState.enemy.health = Math.max(0, gameState.enemy.health - damage);
+                gameState.enemy.isStunned = true;
+                addMessage(`¡Usas ${skillName}! Causas ${damage} puntos de daño al ${gameState.enemy.name} y lo aturdes.`);
+                break;
+                
+            default:
+                skillName = "Ataque Rápido";
+                damage = gameState.player.attack;
+                gameState.enemy.health = Math.max(0, gameState.enemy.health - damage);
+                addMessage(`¡Usas ${skillName}! Causas ${damage} puntos de daño al ${gameState.enemy.name}.`);
+                break;
+        }
+        
+        // Animar al jugador
+        document.getElementById('player-sprite').classList.add('attack');
+        setTimeout(() => document.getElementById('player-sprite').classList.remove('attack'), 500);
+        
+        // Animar daño al enemigo
+        setTimeout(() => {
+            document.getElementById('enemy-sprite').classList.add('hit');
+            setTimeout(() => document.getElementById('enemy-sprite').classList.remove('hit'), 300);
+        }, 500);
+        
+        // Actualizar UI
+        setTimeout(() => {
+            updateUI();
+            
+            // Verificar si el enemigo ha sido derrotado
+            if (gameState.enemy.health <= 0) {
+                endCombat(true);
+                return;
+            }
+            
+            // Turno del enemigo
+            gameState.turn = "enemy";
+            setTimeout(enemyTurn, 1000);
+        }, 800);
+    }
+    
+    function useItem() {
+        if (gameState.turn !== "player" || !gameState.combatActive) return;
+        
+        // Mostrar opciones de inventario en un diálogo
+        const dialog = document.getElementById('dialog-modal');
+        const dialogTitle = document.getElementById('dialog-title');
+        const dialogText = document.getElementById('dialog-text');
+        const dialogConfirm = document.getElementById('dialog-confirm');
+        
+        // Configurar el diálogo
+        dialogTitle.textContent = "Inventario";
+        
+        // Crear elementos para cada ítem
+        let html = "<div class='inventory-dialog'>";
+        gameState.player.inventory.forEach(item => {
+            html += `<div class='inventory-option' onclick='selectItem(${item.id})'>
+                <div class='item-name'>${item.name}</div>
+                <div class='item-desc'>${item.description}</div>
+            </div>`;
+        });
+        html += "</div>";
+        
+        dialogText.innerHTML = html;
+        dialogConfirm.textContent = "Cancelar";
+        
+        // Mostrar diálogo
+        dialog.style.display = 'flex';
+    }
+    
+    function selectItem(itemId) {
+        // Cerrar diálogo
+        closeDialog();
+        
+        // Buscar ítem en inventario
+        const item = gameState.player.inventory.find(i => i.id === itemId);
+        if (!item) return;
+        
+        let effect = 0;
+        
+        // Aplicar efecto según tipo de ítem
+        switch(item.type) {
+            case 'heal':
+                effect = Math.min(item.value, gameState.player.maxHealth - gameState.player.health);
+                gameState.player.health += effect;
+                addMessage(`Has usado ${item.name}. Recuperas ${effect} puntos de salud.`);
+                break;
+                
+            case 'energy':
+                effect = Math.min(item.value, gameState.player.maxEnergy - gameState.player.energy);
+                gameState.player.energy += effect;
+                addMessage(`Has usado ${item.name}. Recuperas ${effect} puntos de energía.`);
+                break;
+                
+            case 'damage':
+                effect = Math.max(1, item.value - gameState.enemy.defense);
+                gameState.enemy.health = Math.max(0, gameState.enemy.health - effect);
+                addMessage(`Has usado ${item.name} contra el enemigo. Causas ${effect} puntos de daño.`);
+                
+                // Animar daño al enemigo
+                document.getElementById('enemy-sprite').classList.add('hit');
+                setTimeout(() => document.getElementById('enemy-sprite').classList.remove('hit'), 300);
+                break;
+        }
+        
+        // Eliminar el ítem usado
+        const itemIndex = gameState.player.inventory.findIndex(i => i.id === itemId);
+        if (itemIndex !== -1) {
+            gameState.player.inventory.splice(itemIndex, 1);
+        }
+        
+        // Actualizar UI
+        updateUI();
+        
+        // Verificar si el enemigo ha sido derrotado
+        if (gameState.enemy.health <= 0) {
+            endCombat(true);
+            return;
+        }
+        
+        // Pasar turno al enemigo
+        gameState.turn = "enemy";
+        setTimeout(enemyTurn, 1000);
+    }
+    
+    function defend() {
+        if (gameState.turn !== "player" || !gameState.combatActive) return;
+        
+        // Aumentar defensa temporalmente
+        const defenseBonus = Math.floor(gameState.player.defense * 0.5);
+        gameState.player.defense += defenseBonus;
+        gameState.player.defending = true;
+        
+        addMessage(`Te has puesto en posición defensiva. Tu defensa aumenta ${defenseBonus} puntos.`);
+        
+        // Turno del enemigo
+        gameState.turn = "enemy";
+        setTimeout(enemyTurn, 1000);
+    }
+    
+    function enemyTurn() {
+        if (!gameState.combatActive) return;
+        
+        // Verificar si el enemigo está aturdido
+        if (gameState.enemy.isStunned) {
+            addMessage(`${gameState.enemy.name} está aturdido y no puede atacar este turno.`);
+            gameState.enemy.isStunned = false; // Recuperarse del aturdimiento
+            gameState.turn = "player";
+            return;
+        }
+        
+        // El enemigo ataca
+        const damage = Math.max(1, gameState.enemy.attack - gameState.player.defense);
+        gameState.player.health = Math.max(0, gameState.player.health - damage);
+        
+        // Mensaje
+        addMessage(`${gameState.enemy.name} te ataca y causa ${damage} puntos de daño.`);
+        
+        // Animar daño al jugador
+        document.getElementById('player-sprite').classList.add('hit');
+        setTimeout(() => document.getElementById('player-sprite').classList.remove('hit'), 300);
+        
+        // Si el jugador estaba defendiendo, quitar el bono de defensa
+        if (gameState.player.defending) {
+            const defenseBonus = Math.floor(gameState.player.defense * 0.5 / 1.5);
+            gameState.player.defense -= defenseBonus;
+            gameState.player.defending = false;
+        }
+        
+        // Actualizar UI
+        updateUI();
+        
+        // Verificar si el jugador ha sido derrotado
+        if (gameState.player.health <= 0) {
+            endCombat(false);
+            return;
+        }
+        
+        // Devolver turno al jugador
+        gameState.turn = "player";
+    }
+    
+    function endCombat(victory) {
+        gameState.combatActive = false;
+        
+        const resultModal = document.getElementById('combat-result-modal');
+        const resultTitle = document.getElementById('result-title');
+        const resultText = document.getElementById('result-text');
+        
+        if (victory) {
+            // Victoria
+            resultTitle.textContent = '¡Victoria!';
+            
+            // Calcular recompensas
+            const expGained = gameState.enemy.exp;
+            const creditsGained = gameState.enemy.credits;
+            
+            // Actualizar estadísticas del jugador
+            gameState.player.exp += expGained;
+            gameState.player.credits += creditsGained;
+            
+            // Verificar subida de nivel
+            let levelUpText = '';
+            if (gameState.player.exp >= gameState.player.nextLevelExp) {
+                const oldLevel = gameState.player.level;
+                gameState.player.level++;
+                gameState.player.exp -= gameState.player.nextLevelExp;
+                gameState.player.nextLevelExp = 100 * Math.pow(1.5, gameState.player.level - 1);
+                gameState.player.attack += 2;
+                gameState.player.defense += 1;
+                gameState.player.maxHealth += 10;
+                gameState.player.health = gameState.player.maxHealth; // Recuperación total
+                
+                levelUpText = `<p style="color: var(--gothic-gold); margin-top: 10px;">¡Has subido al nivel ${gameState.player.level}!</p>
+                <p>Ataque +2</p>
+                <p>Defensa +1</p>
+                <p>Salud Máxima +10</p>`;
+            }
+            
+            // Item aleatorio como recompensa
+            const randomItems = [
+                { name: "Poción de salud", type: "heal", value: 30, description: "Restaura 30 puntos de salud" },
+                { name: "Granada EMP", type: "damage", value: 25, description: "Causa 25 puntos de daño al enemigo" },
+                { name: "Estimulante neural", type: "energy", value: 20, description: "Restaura 20 puntos de energía" },
+                { name: "Fragmento de datos", type: "quest", value: 1, description: "Componente para mejoras" }
+            ];
+            
+            const randomItem = randomItems[Math.floor(Math.random() * randomItems.length)];
+            const newItemId = Date.now(); // ID único basado en timestamp
+            randomItem.id = newItemId;
+            gameState.player.inventory.push(randomItem);
+            
+            // Mostrar texto de resultado
+            resultText.innerHTML = `
+                Has derrotado a ${gameState.enemy.name}.
+                <div style="margin-top: 15px;">
+                    <p>Recompensas:</p>
+                    <ul style="list-style-type: none; padding-left: 20px;">
+                        <li>+ ${expGained} EXP</li>
+                        <li>+ ${creditsGained} Créditos</li>
+                        <li>+ ${randomItem.name}</li>
+                    </ul>
+                    ${levelUpText}
+                </div>
+            `;
+            
+        } else {
+            // Derrota
+            resultTitle.textContent = '¡Derrota!';
+            resultText.innerHTML = `
+                Has sido derrotado por ${gameState.enemy.name}.
+                <div style="margin-top: 15px;">
+                    <p>Pierdes ${Math.floor(gameState.player.credits * 0.1)} créditos en el combate.</p>
+                </div>
+            `;
+            
+            // Penalización por derrota
+            gameState.player.credits = Math.floor(gameState.player.credits * 0.9);
+            gameState.player.health = Math.floor(gameState.player.maxHealth * 0.3); // Recuperación parcial
+        }
+        
+        // Mostrar modal
+        resultModal.style.display = 'flex';
+        
+        // Guardar progreso
+        saveGame();
+    }
+    
+    function continueBattle() {
+        // Cerrar modal
+        document.getElementById('combat-result-modal').style.display = 'none';
+        
+        // Si fue victoria, generar nuevo enemigo
+        if (gameState.player.health > 0) {
+            generateNewEnemy();
+            gameState.combatActive = true;
+            gameState.turn = "player";
+            addMessage("Un nuevo enemigo aparece.");
+            updateUI();
+        } else {
+            // Si fue derrota, volver al menú
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+    }
+    
+    function generateNewEnemy() {
+        // Lista de posibles enemigos
+        const enemies = [
+            {
+                name: "Espectro Cibernético",
+                health: 80,
+                attack: 8,
+                defense: 3,
+                exp: 25,
+                credits: 75
+            },
+            {
+                name: "Dron Centinela",
+                health: 60,
+                attack: 12,
+                defense: 2,
+                exp: 30,
+                credits: 85
+            },
+            {
+                name: "Cazador Digital",
+                health: 100,
+                attack: 7,
+                defense: 5,
+                exp: 35,
+                credits: 90
+            }
+        ];
+        
+        // Seleccionar uno aleatorio
+        const enemyTemplate = enemies[Math.floor(Math.random() * enemies.length)];
+        
+        // Ajustar según nivel del jugador
+        const levelFactor = 1 + (gameState.player.level - 1) * 0.2;
+        
+        // Asignar al estado del juego
+        gameState.enemy = {
+            name: enemyTemplate.name,
+            maxHealth: Math.floor(enemyTemplate.health * levelFactor),
+            health: Math.floor(enemyTemplate.health * levelFactor),
+            attack: Math.floor(enemyTemplate.attack * levelFactor),
+            defense: Math.floor(enemyTemplate.defense * levelFactor),
+            isStunned: false,
+            exp: Math.floor(enemyTemplate.exp * levelFactor),
+            credits: Math.floor(enemyTemplate.credits * levelFactor)
+        };
+        
+        // Actualizar UI para mostrar nuevo enemigo
+        document.getElementById('enemy-name').textContent = gameState.enemy.name;
+        document.getElementById('enemy-health-fill').style.width = '100%';
+        
+        // Cambiar sprite según el enemigo
+        const enemySprite = document.getElementById('enemy-sprite');
+        switch (gameState.enemy.name) {
+            case "Dron Centinela":
+                enemySprite.style.backgroundImage = "url('assets/images/enemies/drone_sentinel.png')";
+                break;
+            case "Cazador Digital":
+                enemySprite.style.backgroundImage = "url('assets/images/enemies/digital_hunter.png')";
+                break;
+            default:
+                enemySprite.style.backgroundImage = "url('assets/images/enemies/cyber_ghoul.png')";
+        }
+    }
+    
+    function saveGame() {
+        try {
+            // Crear objeto de guardado
+            const saveData = {
+                name: gameState.player.name,
+                level: gameState.player.level,
+                exp: gameState.player.exp,
+                maxHealth: gameState.player.maxHealth,
+                health: gameState.player.health,
+                maxEnergy: gameState.player.maxEnergy,
+                energy: gameState.player.energy,
+                baseAttack: gameState.player.attack,
+                baseDefense: gameState.player.defense,
+                baseSpeed: gameState.player.speed,
+                credits: gameState.player.credits,
+                inventory: gameState.player.inventory,
+                specialization: gameState.player.specialization,
+                lastSave: new Date().toISOString(),
+                location: 'ruinas_tecnologicas'
+            };
+            
+            // Guardar en localStorage

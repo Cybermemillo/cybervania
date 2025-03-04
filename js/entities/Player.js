@@ -1,201 +1,270 @@
 /**
- * Clase para el jugador del juego
+ * Clase del jugador para el juego Cybervania
+ * Maneja las estadísticas, inventario y habilidades del personaje
  */
 export class Player {
-    constructor(data = {}) {
-        // Datos básicos
-        this.name = data.name || 'Hacker';
-        this.gender = data.gender || 'male';
-        this.specialization = data.specialization || 'neutral';
-        this.backstory = data.backstory || '';
+    constructor(playerData = {}) {
+        // Datos identificativos
+        this.id = playerData.id || this.generateId();
+        this.name = playerData.name || 'Hacker';
+        this.gender = playerData.gender || 'other';
+        this.specialization = playerData.specialization || 'balanced';
         
-        // Estadísticas
-        this.level = data.level || 1;
-        this.experience = data.experience || 0;
-        this.health = data.health || 100;
-        this.maxHealth = data.maxHealth || 100;
-        this.energy = data.energy || 100;
-        this.maxEnergy = data.maxEnergy || 100;
+        // Estadísticas básicas
+        this.level = playerData.level || 1;
+        this.exp = playerData.exp || 0;
+        this.expToNextLevel = this.calculateExpToNextLevel();
+        
+        // Salud y energía
+        this.maxHealth = playerData.maxHealth || 100;
+        this.health = playerData.health || this.maxHealth;
+        this.maxEnergy = playerData.maxEnergy || 50;
+        this.energy = playerData.energy || this.maxEnergy;
+        
+        // Estadísticas de combate
+        this.baseAttack = playerData.baseAttack || 10;
+        this.baseDefense = playerData.baseDefense || 5;
+        this.baseMagic = playerData.baseMagic || 8;
+        this.baseSpeed = playerData.baseSpeed || 7;
         
         // Recursos
-        this.credits = data.credits || 500;
-        this.inventory = data.inventory || [];
+        this.credits = playerData.credits || 100;
+        this.inventory = playerData.inventory || [];
+        this.equippedItems = playerData.equippedItems || {};
+        this.skills = playerData.skills || [];
         
-        // Metadatos
-        this.slot = data.slot || -1;
-        this.lastSaved = data.lastSaved || new Date().toISOString();
-        this.playTime = data.playTime || 0;
+        // Aplicar modificadores según la especialización
+        this.applySpecializationModifiers();
         
-        // Ajustar estadísticas según especialización
-        this.applySpecializationBonus();
+        // Datos de tiempo y ubicación
+        this.lastSave = playerData.lastSave || new Date().toISOString();
+        this.location = playerData.location || 'cyber_district_start';
+        this.timePlayed = playerData.timePlayed || 0;
     }
     
-    applySpecializationBonus() {
-        switch(this.specialization) {
-            case 'red':
-                // Bonus ofensivo (daño +25%, salud -5%, defensa -10%)
-                this.attackBonus = 0.25;
-                this.maxHealth = Math.round(this.maxHealth * 0.95);
-                this.health = this.maxHealth;
-                this.defenseBonus = -0.1;
-                this.actionPoints = 3;
+    /**
+     * Genera un ID único para el jugador
+     */
+    generateId() {
+        return 'player_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+    }
+    
+    /**
+     * Aplica modificadores según la especialización del personaje
+     */
+    applySpecializationModifiers() {
+        switch (this.specialization) {
+            case 'red': // Ofensivo
+                this.baseAttack *= 1.3; // +30% ataque
+                this.baseDefense *= 0.9; // -10% defensa
                 break;
                 
-            case 'blue':
-                // Bonus defensivo (salud +15%, defensa +20%, ataque -5%)
-                this.maxHealth = Math.round(this.maxHealth * 1.15);
-                this.health = this.maxHealth;
-                this.defenseBonus = 0.2;
-                this.attackBonus = -0.05;
-                this.actionPoints = 3;
+            case 'blue': // Defensivo
+                this.baseDefense *= 1.3; // +30% defensa
+                this.baseAttack *= 0.9; // -10% ataque
                 break;
                 
-            case 'purple':
-                // Equilibrado con acción extra (todo +5%)
-                this.maxHealth = Math.round(this.maxHealth * 1.05);
-                this.health = this.maxHealth;
-                this.defenseBonus = 0.05;
-                this.attackBonus = 0.05;
-                this.actionPoints = 4;
+            case 'purple': // Equilibrado
+                this.actionsPerTurn = 4; // +1 acción por turno
                 break;
                 
             default:
-                // Sin bonificaciones
-                this.attackBonus = 0;
-                this.defenseBonus = 0;
-                this.actionPoints = 3;
+                this.actionsPerTurn = 3;
+                break;
         }
     }
     
     /**
-     * Guarda el estado del jugador en un slot
+     * Calcula la experiencia necesaria para subir al siguiente nivel
      */
-    save(slotIndex) {
-        this.slot = slotIndex;
-        this.lastSaved = new Date().toISOString();
-        
-        // Guardar en localStorage
-        const saveData = this.serialize();
-        localStorage.setItem(`cybervania_save_${slotIndex}`, JSON.stringify(saveData));
-        
-        // Actualizar información de slots
-        const slots = Player.getSaveSlotInfo();
-        slots[slotIndex] = {
-            isEmpty: false,
-            playerName: this.name,
-            level: this.level,
-            specialization: this.specialization,
-            gender: this.gender,
-            timestamp: new Date().getTime()
-        };
-        
-        localStorage.setItem('cybervania_save_slots', JSON.stringify(slots));
-        
-        return true;
+    calculateExpToNextLevel() {
+        return 100 * Math.pow(1.5, this.level - 1);
     }
     
     /**
-     * Serializa el objeto para guardado
+     * Añade experiencia al jugador y sube de nivel si es suficiente
+     * @param {number} amount - Cantidad de experiencia a añadir
+     * @return {object} - Objeto con información sobre el cambio de nivel si ocurrió
      */
-    serialize() {
+    addExperience(amount) {
+        this.exp += amount;
+        
+        // Verificar si sube de nivel
+        if (this.exp >= this.expToNextLevel) {
+            const oldLevel = this.level;
+            this.levelUp();
+            
+            return {
+                leveledUp: true,
+                oldLevel: oldLevel,
+                newLevel: this.level,
+                statsIncrease: {
+                    maxHealth: this.maxHealth - (oldLevel * 10),
+                    attack: this.baseAttack - (oldLevel * 2),
+                    defense: this.baseDefense - (oldLevel * 1.5)
+                }
+            };
+        }
+        
+        return { leveledUp: false, exp: this.exp };
+    }
+    
+    /**
+     * Sube de nivel al jugador
+     */
+    levelUp() {
+        this.level++;
+        
+        // Actualizar experiencia para siguiente nivel
+        this.exp = 0;
+        this.expToNextLevel = this.calculateExpToNextLevel();
+        
+        // Mejorar estadísticas
+        this.maxHealth += 10;
+        this.health = this.maxHealth; // Recupera toda la salud al subir de nivel
+        this.baseAttack += 2;
+        this.baseDefense += 1.5;
+        this.baseMagic += 1.5;
+        this.baseSpeed += 1;
+        
+        // Aplicar modificadores de especialización de nuevo
+        this.applySpecializationModifiers();
+        
+        // Desbloquear nuevas habilidades según nivel
+        this.checkLevelSkills();
+    }
+    
+    /**
+     * Verifica y desbloquea habilidades según el nivel
+     */
+    checkLevelSkills() {
+        // Aquí se desbloquearian habilidades específicas según el nivel
+        // Por ahora es solo un placeholder
+        const newSkills = [];
+        
+        // Ejemplos de habilidades por nivel
+        if (this.level === 2) {
+            newSkills.push({
+                id: 'double_attack',
+                name: 'Ataque Doble',
+                description: 'Realiza dos ataques consecutivos con penalización',
+                type: 'active',
+                cost: 15
+            });
+        }
+        
+        if (this.level === 3) {
+            newSkills.push({
+                id: 'cyber_shield',
+                name: 'Escudo Cibernético',
+                description: 'Crea un escudo que absorbe daño por 3 turnos',
+                type: 'active',
+                cost: 20
+            });
+        }
+        
+        // Añadir nuevas habilidades al jugador
+        for (const skill of newSkills) {
+            if (!this.hasSkill(skill.id)) {
+                this.skills.push(skill);
+            }
+        }
+        
+        return newSkills;
+    }
+    
+    /**
+     * Comprueba si el jugador tiene una habilidad específica
+     */
+    hasSkill(skillId) {
+        return this.skills.some(s => s.id === skillId);
+    }
+    
+    /**
+     * Actualiza el tiempo jugado
+     * @param {number} seconds - Segundos a añadir
+     */
+    addPlayTime(seconds) {
+        this.timePlayed += seconds;
+    }
+    
+    /**
+     * Guarda la partida actual
+     */
+    save() {
+        const saveData = {
+            ...this,
+            lastSave: new Date().toISOString()
+        };
+        
+        // Actualizar en localStorage
+        try {
+            localStorage.setItem('current_player', JSON.stringify(saveData));
+            
+            // También guardar en las ranuras de guardado
+            const saveSlots = JSON.parse(localStorage.getItem('save_slots') || '[]');
+            
+            // Buscar si ya existe una partida con este ID para actualizarla
+            const existingSlotIndex = saveSlots.findIndex(slot => slot.id === this.id);
+            
+            if (existingSlotIndex >= 0) {
+                saveSlots[existingSlotIndex] = saveData;
+            } else {
+                saveSlots.push(saveData);
+            }
+            
+            localStorage.setItem('save_slots', JSON.stringify(saveSlots));
+            
+            return true;
+        } catch (e) {
+            console.error('Error guardando partida:', e);
+            return false;
+        }
+    }
+    
+    /**
+     * Devuelve una representación del objeto para serialización
+     */
+    toJSON() {
         return {
+            id: this.id,
             name: this.name,
             gender: this.gender,
             specialization: this.specialization,
-            backstory: this.backstory,
             level: this.level,
-            experience: this.experience,
-            health: this.health,
+            exp: this.exp,
             maxHealth: this.maxHealth,
-            energy: this.energy,
+            health: this.health,
             maxEnergy: this.maxEnergy,
+            energy: this.energy,
+            baseAttack: this.baseAttack,
+            baseDefense: this.baseDefense,
+            baseMagic: this.baseMagic,
+            baseSpeed: this.baseSpeed,
             credits: this.credits,
             inventory: this.inventory,
-            slot: this.slot,
-            lastSaved: this.lastSaved,
-            playTime: this.playTime
+            equippedItems: this.equippedItems,
+            skills: this.skills,
+            lastSave: this.lastSave,
+            location: this.location,
+            timePlayed: this.timePlayed,
+            created: this.created || this.lastSave
         };
     }
-    
-    /**
-     * Inicia una nueva partida
-     */
-    static startNewGame(name, specialization, gender, backstory = '') {
-        return new Player({
-            name,
-            specialization,
-            gender,
-            backstory,
-            slot: -1 // Aún no guardada
-        });
-    }
-    
-    /**
-     * Carga una partida desde un slot
-     */
-    static loadGame(slotIndex) {
-        try {
-            const saveData = localStorage.getItem(`cybervania_save_${slotIndex}`);
-            if (!saveData) return null;
-            
-            return new Player(JSON.parse(saveData));
-        } catch (e) {
-            console.error('Error cargando partida:', e);
-            return null;
+}
+
+/**
+ * Carga un jugador desde localStorage
+ */
+export function loadPlayer() {
+    try {
+        const savedData = localStorage.getItem('current_player');
+        if (savedData) {
+            return new Player(JSON.parse(savedData));
         }
+    } catch (e) {
+        console.error('Error cargando jugador:', e);
     }
     
-    /**
-     * Obtiene información de los slots de guardado
-     */
-    static getSaveSlotInfo() {
-        let slots;
-        try {
-            const slotsData = localStorage.getItem('cybervania_save_slots');
-            slots = slotsData ? JSON.parse(slotsData) : [];
-        } catch (e) {
-            slots = [];
-        }
-        
-        // Asegurar que tenemos 3 slots
-        while (slots.length < 3) {
-            slots.push({ isEmpty: true });
-        }
-        
-        return slots;
-    }
-    
-    /**
-     * Obtiene el tema del menú principal (personalizado en futuras versiones)
-     */
-    static getMainMenuTheme() {
-        return {
-            title: "CYBERVANIA",
-            subtitle: "Donde la oscuridad se encuentra con el código",
-            uiElements: {
-                menuFrameColor: "rgba(50, 10, 40, 0.9)",
-                textGlowColor: "rgba(220, 20, 120, 0.6)",
-                mistOpacity: "0.4",
-                backgroundBlur: "5px",
-                font: "'NeoGothic', 'Cinzel', serif",
-                cursor: "default"
-            },
-            menuItems: [
-                { id: "new-game", text: "Nueva Partida", icon: "glyph-plus" },
-                { id: "load-game", text: "Cargar Partida", icon: "glyph-load" },
-                { id: "options", text: "Opciones", icon: "glyph-gear" },
-                { id: "exit", text: "Salir", icon: "glyph-power" }
-            ],
-            audio: {
-                backgroundTrack: "menu_theme.mp3",
-                hoverSound: "menu_hover.mp3",
-                selectSound: "menu_select.mp3",
-                backSound: "menu_back.mp3"
-            },
-            animations: {
-                menuEntrance: "fade-from-mist",
-                transitionEffect: "digital-dissolve"
-            }
-        };
-    }
+    return null;
 }

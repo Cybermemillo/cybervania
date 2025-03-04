@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargando fuentes...</title>
+    <style>
+        @font-face {
+            font-family: 'Anemouth';
+            src: url('./assets/fonts/Anemouth.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        body {
+            background-color: #0a0205;
+            color: #e8dacb;
+            font-family: 'Anemouth', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        
+        .loading-text {
+            font-size: 32px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+        
+        .font-sample {
+            font-size: 20px;
+            opacity: 0.7;
+            margin-top: 20px;
+            letter-spacing: 1px;
+        }
+        
+        .loading-bar {
+            width: 300px;
+            height: 10px;
+            border: 2px solid #4d0f1c;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .loading-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background-color: #800e0e;
+            animation: load 2s forwards;
+        }
+        
+        @keyframes load {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Esperar a que la fuente se cargue correctamente
+            document.fonts.ready.then(() => {
+                // Comprobar si la fuente se ha cargado correctamente
+                if (document.fonts.check('1em Anemouth')) {
+                    console.log('Fuente Anemouth cargada correctamente');
+                } else {
+                    console.warn('La fuente Anemouth no se cargó, se usará fuente fallback');
+                }
+                
+                // Redirigir al index después de un breve retraso
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2500); // 2.5 segundos para ver la animación de carga
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="loading-text">CYBERVANIA</div>
+    <div class="loading-bar">
+        <div class="loading-progress"></div>
+    </div>
+    <div class="font-sample">Cargando fuente Anemouth...</div>
+</body>
+</html>

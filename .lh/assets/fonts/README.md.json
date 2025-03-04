@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1741026171372,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1741033118456,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -12,4 +12,24 @@\n Y agregar la importación de Google Fonts al inicio del archivo CSS:\r\n ```css\r\n @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');\r\n ```\r\n+\r\n+# Fuente pixelada para el tema SNES\r\n+\r\n+Para el estilo de 16 bits, necesitas añadir la siguiente fuente:\r\n+\r\n+- `PressStart2P-Regular.woff2` - Una fuente pixelada que emula la tipografía de juegos retro\r\n+\r\n+Puedes descargar la fuente \"Press Start 2P\" desde:\r\n+- [Google Fonts](https://fonts.google.com/specimen/Press+Start+2P)\r\n+- [Font Library](https://fontlibrary.org/en/font/press-start-2p)\r\n+\r\n+O alternativamente, agregar la referencia CDN en el HTML:\r\n+```html\r\n+<link href=\"https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap\" rel=\"stylesheet\">\r\n+```\r\n+\r\n+Y usarla en el CSS directamente:\r\n+```css\r\n+font-family: 'Press Start 2P', monospace;\r\n+```\r\n"
                 }
             ],
             "date": 1741026171372,

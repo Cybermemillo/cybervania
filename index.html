@@ -4,24 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cybervania - Menú Principal</title>
-    <!-- Estilos CSS -->
-    <link rel="stylesheet" href="css/menu.css">
-    <link rel="stylesheet" href="css/menu-gothic-enhancement.css">
-    <link rel="stylesheet" href="css/gothic-effects.css">
+    
+    <!-- Precarga de fuente Anemouth -->
+    <link rel="preload" href="assets/fonts/Anemouth.ttf" as="font" type="font/ttf" crossorigin>
+    
+    <!-- Backup Google Fonts si Anemouth fallara -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Estilos CSS - Asegurarnos que se cargan en el orden correcto -->
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/cybervania-retro.css">
     <link rel="stylesheet" href="css/language-specific.css">
-    
-    <!-- Precargar la fuente -->
-    <link rel="preload" href="assets/fonts/neogothic.woff2" as="font" type="font/woff2" crossorigin>
-    
-    <!-- Fuentes góticas desde Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&family=Pirata+One&display=swap" rel="stylesheet">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="assets/images/favicon.png">
+    
+    <!-- Script para verificar la carga de la fuente -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar si la fuente Anemouth está disponible
+            if (!document.fonts.check('1em Anemouth')) {
+                console.warn('La fuente Anemouth no está disponible, usando Google Fonts como respaldo');
+                document.body.classList.add('using-fallback-font');
+                
+                // Aplicar Cinzel como fuente alternativa
+                document.documentElement.style.setProperty('--header-font', "'Cinzel', serif");
+                document.documentElement.style.setProperty('--body-font', "'Cinzel', serif");
+            } else {
+                console.log('Fuente Anemouth cargada correctamente');
+            }
+        });
+    </script>
 </head>
-<body class="cursor-gothic lang-es">
+<body>
     <!-- Audio indicator discreto -->
     <div id="audio-indicator" class="notification" style="opacity: 0;">
         Haz clic para activar audio
